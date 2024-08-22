@@ -15,7 +15,7 @@ wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
 band_indices = np.where(wavelengths <= 1350)[0]
 image_filtered = image[:, :, band_indices]
 
-# Calculate the average absorption across the selected bands for each pixel
+# Calculate the average absorption across the selected band for each pixel
 average_absorption = np.mean(image_filtered, axis=2)
 
 # Normalize the average absorption to the range [0, 255] for creating a grayscale image

@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib.image import imread
 
 # Settings
-minRatio = 4
-maxRatio = 10
+minRatio = 5
+maxRatio = 8
 wavelength1 = 1080
 wavelength2 = 1460
 
@@ -30,8 +30,12 @@ index2 = np.argmin(np.abs(wavelengths - wavelength2))
 print(wavelengths[index1], wavelengths[index2])
 print(image[500,100,index2] / image[500,100,index1])
 
+# Ensure the arrays are explicitly cast to the same type
+index1_data = np.array(image[:, :, index1], dtype=np.float32)
+index2_data = np.array(image[:, :, index2], dtype=np.float32)
+
 # Calculate the ratio of absorbance at the two wavelengths for each pixel
-ratio_image = image[:, :, index2] / (image[:, :, index1])  # Calculate the ratio
+ratio_image = np.divide(index2_data, index1_data + 1e-10)  # Use np.divide to calculate the ratio
 
 # Ensure that ratio_image is 2D
 ratio_image = np.squeeze(ratio_image)  # Remove any singleton dimensions

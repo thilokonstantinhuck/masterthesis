@@ -19,6 +19,13 @@ if binary_mask.ndim == 3:  # If the mask has multiple channels (e.g., RGB)
 # Ensure the mask is binary (0 or 1)
 binary_mask = (binary_mask > 0).astype(np.uint8)
 
+# Retrieve the wavelengths from the header metadata
+wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
+
+# Select only the bands with wavelengths up to 1350 nm
+band_indices = np.where(wavelengths <= 1350)[0]
+image = image[:, :, band_indices]
+
 # Print image dimensions
 nrows, ncols, nbands = image.shape
 print(f"Number of rows: {nrows}")
