@@ -24,7 +24,7 @@ processed_image = np.zeros_like(image)
 for column in range(ncols):
     for row in range(nrows):
         spectra = image[row, column, :].squeeze()  # Get the spectra for each pixel in the column
-        processedSpectra = np.log10(avg_white / spectra)  # Process the spectra
+        processedSpectra = -np.log10(spectra/avg_white)  # Process the spectra
         processed_image[row, column, :] = processedSpectra  # Store the processed spectra
 
 # Save the processed image in ENVI format

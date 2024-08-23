@@ -33,6 +33,9 @@ for top_left, bottom_right, name in rectangles:
 ax.set_title('Binary Mask with Rectangles')
 ax.axis('on')  # Show the axes
 
+# Save the plot as an image file
+fig.savefig('binary_mask_with_rectangles.png', dpi=300, bbox_inches='tight')
+
 # Display the plot
 plt.show()
 
