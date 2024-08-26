@@ -163,3 +163,8 @@ cython_debug/
 
 # generated
 *.png
+*.hdr
+*.img
+*.xml
+*.xlsx
+*.iml
