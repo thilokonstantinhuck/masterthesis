@@ -28,7 +28,7 @@ for column in range(ncols):
         processed_image[row, column, :] = processedSpectra  # Store the processed spectra
 
 # Save the processed image in ENVI format
-output_hdr = "processed_image.hdr"
+output_hdr = "processed_image_absorbance.hdr"
 envi.save_image(output_hdr, processed_image, dtype=np.float32, interleave=img.metadata['interleave'],
                 metadata=img.metadata, force=True)
 

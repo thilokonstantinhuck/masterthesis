@@ -5,7 +5,7 @@ from sklearn.decomposition import PCA
 from matplotlib.image import imread
 
 # Load the hyperspectral image
-hdr = r"D:\Salmon_HSI_NP_15032023\SWIR_Hyspex\All_converted_file\S6-R-G1_SWIR_384_SN3151_9006us_2022-05-02T120753_raw_rad_float32.hdr"
+hdr = "processed_image_EMSC.hdr"
 img = envi.open(hdr)
 image = img.load()
 
