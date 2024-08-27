@@ -1,13 +1,12 @@
 import numpy as np
 import spectral.io.envi as envi
 from PIL import Image
-
-# Settings
-overlitDefinition = 0.75
+from config.generalParameters import overlitDefinition
+from main import imageFilePath
+from main import filename
 
 # Load the image
-hdr = r"D:\Salmon_HSI_NP_15032023\SWIR_Hyspex\All_converted_file\S6-R-G1_SWIR_384_SN3151_9006us_2022-05-02T120753_raw_rad_float32.hdr"
-img = envi.open(hdr)
+img = envi.open(imageFilePath)
 image = img.load()
 
 # Create the mask
@@ -16,7 +15,7 @@ mask = np.all(image <= overlitDefinition, axis=-1).astype(np.uint8) * 255
 
 # Convert the mask to an image and save as PNG
 mask_image = Image.fromarray(mask)
-mask_image.save("maskOverlit.png")
+mask_image.save(f"..\masks\mask{filename}Overlit.png")
 
 print("Processed mask saved successfully.")
 

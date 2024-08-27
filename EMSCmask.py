@@ -7,11 +7,7 @@ hdr = "processed_image_EMSC.hdr"
 img = envi.open(hdr)
 image = img.load()
 
-# Settings
-minRatio = 0.9  # Adjust according to the range in your data
-maxRatio = 1.75  # Adjust according to the range in your data
-wavelength1 = 1080
-wavelength2 = 1460
+
 
 # Retrieve the wavelengths from the header metadata
 wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
