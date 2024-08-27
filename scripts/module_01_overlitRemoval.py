@@ -3,7 +3,7 @@ import spectral.io.envi as envi
 from PIL import Image
 from config.generalParameters import overlitDefinition
 from main import imageFilePath
-from main import filename
+from main import samplename
 
 # Load the image
 img = envi.open(imageFilePath)
@@ -15,7 +15,7 @@ mask = np.all(image <= overlitDefinition, axis=-1).astype(np.uint8) * 255
 
 # Convert the mask to an image and save as PNG
 mask_image = Image.fromarray(mask)
-mask_image.save(f"..\masks\mask{filename}Overlit.png")
+mask_image.save(f".\masks\mask{samplename}Overlit.png")
 
 print("Processed mask saved successfully.")
 
