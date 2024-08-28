@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.image import imread
 import matplotlib.patches as patches
 import numpy as np
+from PIL import Image
 
 def cutMaskCreation(samplename, rectangles):
     # Load the binary mask
@@ -26,7 +27,7 @@ def cutMaskCreation(samplename, rectangles):
     ax.axis('on')  # Show the axes
 
     # Save the plot as an image file
-    fig.savefig(f"./plots/plot_combined_mask_{samplename}.png", dpi=300, bbox_inches='tight')
+    fig.savefig(f"./plots/plot_{samplename}_combined_mask.png", dpi=300, bbox_inches='tight')
 
     # Display the plot
     plt.show()
@@ -40,8 +41,11 @@ def cutMaskCreation(samplename, rectangles):
         mask[top_left[0]:bottom_right[0], top_left[1]:bottom_right[1]] = binary_mask[top_left[0]:bottom_right[0],
                                                                          top_left[1]:bottom_right[1]]
 
-        # Save the mask with a filename derived from the rectangle's name
-        filename = f'./masks/binary_mask_partial_{samplename}_{name}.png'
-        plt.imsave(filename, mask, cmap='gray')
+        # Convert the mask to uint8 (assuming mask is binary)
+        mask = (mask * 255).astype(np.uint8)
 
-        print(f"Mask saved as {filename}")
+        # Convert the mask to an image and save as PNG
+        mask_image = Image.fromarray(mask)
+        mask_image.save(f"./masks/binary_mask_partial_{samplename}_{name}.png")
+
+        print(f"Mask for {samplename} {name} saved")

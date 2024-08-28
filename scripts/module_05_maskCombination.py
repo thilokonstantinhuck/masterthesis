@@ -34,6 +34,7 @@ def combineMasks(samplename):
     axes[1].set_title(f"Overlit Mask for {samplename}")
     axes[1].axis('off')
 
+    plt.savefig(f"./plots/plot_{samplename}_mask_combination_analysis.png", dpi=1000)
     plt.show()
 
     # Save the final combined mask as a new binary mask image
