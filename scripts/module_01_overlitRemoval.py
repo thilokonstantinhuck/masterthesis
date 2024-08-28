@@ -14,7 +14,7 @@ def overlit(imageFilePath, samplename):
 
     # Convert the mask to an image and save as PNG
     mask_image = Image.fromarray(mask)
-    mask_image.save(f".\\masks\\mask{samplename}Overlit.png")
+    mask_image.save(f"./masks/binary_mask_{samplename}_overlit.png")
 
     print(f"Overlit mask {samplename} saved successfully.")
 
@@ -31,8 +31,8 @@ def overlit(imageFilePath, samplename):
                 processed_image[row, column, :] = 1.0
 
     # Save the processed image in ENVI format
-    output_hdr = f".\\tempImages\\processed_image_{samplename}_overlit.hdr"
+    output_hdr = f"./tempImages/processed_image_{samplename}_overlit.hdr"
     envi.save_image(output_hdr, processed_image, dtype=np.float32, interleave=img.metadata['interleave'],
                     metadata=img.metadata, force=True)
 
-    print(f"Overlit processed image {samplename}saved successfully.")
+    print(f"Overlit processed image {samplename} saved successfully.")

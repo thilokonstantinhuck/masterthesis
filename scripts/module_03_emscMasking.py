@@ -1,11 +1,13 @@
 import spectral.io.envi as envi
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 from config.generalParameters import emscMinRatio, emscMaxRatio, emscWavelength1, emscWavelength2
+
 
 def emscProcessing(samplename):
     # Load the hyperspectral image with absorption data
-    hdr = f".\\tempImages\\processed_image_{samplename}_EMSC.hdr"
+    hdr = f"./tempImages/processed_image_{samplename}_EMSC.hdr"
     img = envi.open(hdr)
     image = img.load()
 
@@ -27,7 +29,7 @@ def emscProcessing(samplename):
     ratio_image = np.squeeze(ratio_image)  # Remove any singleton dimensions
 
     # Create a binary mask based on the minRatio and maxRatio
-    binary_mask = np.where((ratio_image >= emscMinRatio) & (ratio_image <= emscMaxRatio), 1, 0)
+    binary_mask = np.where((ratio_image >= emscMinRatio) & (ratio_image <= emscMaxRatio), 1, 0).astype(np.uint8) * 255
 
     # Display the ratio image and the binary mask side by side
     plt.figure(figsize=(10, 7))
@@ -49,5 +51,8 @@ def emscProcessing(samplename):
     plt.show()
 
     # Save the binary mask as a PNG file
-    plt.imsave(f"./masks/binary_mask_{samplename}_emsc.png", binary_mask, cmap='gray')
+    # plt.imsave(f"./masks/binary_mask_{samplename}_emsc.png", binary_mask, cmap='gray')
+    # Convert the mask to an image and save as PNG
+    mask_image = Image.fromarray(binary_mask)
+    mask_image.save(f"./masks/binary_mask_{samplename}_emsc.png")
     print(f"EMSC mask {samplename} saved successfully.")
