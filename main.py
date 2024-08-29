@@ -8,10 +8,14 @@ import os
 
 imageFilePath = os.path.join(imageFolder, filename)
 
+# Remove overlit Pixels, which are shown by a maxed out Value at some point in the Spectra
+# from scripts.module_01_preProcessing import absorbanceHDRcreation
+# absorbanceHDRcreation(imageFilePath, samplename, referenceArea)
+#
 # # Remove overlit Pixels, which are shown by a maxed out Value at some point in the Spectra
-# from scripts.module_01_overlitRemoval import overlit
+# from scripts.module_01_preProcessing import overlit
 # overlit(imageFilePath, samplename)
-# #
+#
 # # # Run EMSC on the data
 # from scripts.module_02_emscProcessing import emsc_transformation
 # emsc_transformation(referenceArea, samplename)
@@ -23,7 +27,11 @@ imageFilePath = os.path.join(imageFolder, filename)
 # # combine masks
 # from scripts.module_05_maskCombination import combineMasks
 # combineMasks(samplename)
+#
+# # create cut masks
+# from scripts.module_04_cutMasks import cutMaskCreation
+# cutMaskCreation(samplename, areasOfInterest)
 
-# create cut masks
-from scripts.module_04_cutMasks import cutMaskCreation
-cutMaskCreation(samplename, areasOfInterest)
+# create average plots
+from scripts.module_06_displayAreaAverageWavelengths import averagePlotAreas
+averagePlotAreas(samplename)

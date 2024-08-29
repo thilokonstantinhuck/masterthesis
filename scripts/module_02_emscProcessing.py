@@ -1,7 +1,6 @@
 import spectral.io.envi as envi
 import numpy as np
 from biospectools import EMSC
-from imageio.plugins import fits
 
 
 def average_spectra(imageIN, coordinates):
