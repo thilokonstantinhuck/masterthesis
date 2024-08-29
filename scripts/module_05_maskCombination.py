@@ -1,13 +1,12 @@
 import matplotlib.pyplot as plt
 from matplotlib.image import imread
 import numpy as np
-
+from PIL import Image
 
 def combineMasks(samplename):
     # Load the binary masks
     binary_mask_overlit = imread(f"./masks/binary_mask_{samplename}_overlit.png")
     binary_mask_emsc = imread(f"./masks/binary_mask_{samplename}_emsc.png")
-
 
     # Combine the masks
     combined_mask = binary_mask_emsc * binary_mask_overlit
@@ -37,7 +36,11 @@ def combineMasks(samplename):
     plt.savefig(f"./plots/plot_{samplename}_mask_combination_analysis.png", dpi=1000)
     plt.show()
 
-    # Save the final combined mask as a new binary mask image
-    plt.imsave(f"./masks/binary_mask_{samplename}_combined.png", combined_mask, cmap='gray')
+    # Convert the combined mask to uint8 format for saving
+    combined_mask_uint8 = (combined_mask * 255).astype(np.uint8)
+
+    # Save the final combined mask as a grayscale image using PIL
+    combined_mask_image = Image.fromarray(combined_mask_uint8, mode='L')
+    combined_mask_image.save(f"./masks/binary_mask_{samplename}_combined.png")
 
     print("Final combined mask created and saved successfully.")
