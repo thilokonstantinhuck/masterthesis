@@ -1,5 +1,5 @@
 from config.generalParameters import imageFolder
-from config.S06 import filename, samplename, areasOfInterest, whiteArea, backgroundArea
+from config.S05 import filename, samplename, areasOfInterest, whiteArea, backgroundArea
 
 import os
 
@@ -24,6 +24,10 @@ emscMaskCreation(samplename)
 # combine masks
 from scripts.module_04_masking import combineMasks
 combineMasks(samplename)
+
+# display white area
+from scripts.module_06_visualization import whiteAreaPlotSpectra
+whiteAreaPlotSpectra(samplename, whiteArea)
 
 # analyze rectangles
 from scripts.module_04_masking import rectangleAnalysis

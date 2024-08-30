@@ -3,6 +3,43 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.image import imread
 
+
+def whiteAreaPlotSpectra(samplename, whiteArea):
+    # Load the image
+    hdr = f"./tempImages/processed_image_{samplename}_overlit.hdr"
+    img = envi.open(hdr)
+    image = img.load()
+
+    # Retrieve the wavelengths from the header metadata
+    wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
+
+    # Extract coordinates from whiteArea
+    (y1, x1), (y2, x2) = whiteArea
+
+    # Ensure coordinates are within image bounds
+    height, width, bands = image.shape
+    if x1 < 0 or x2 >= width or y1 < 0 or y2 >= height:
+        print("One or more coordinates are out of bounds.")
+        return
+
+    count = 0  # Initialize a counter
+
+    # Plot spectra for all pixels in the specified area
+    plt.figure(figsize=(10, 6))
+    for x in range(x1, x2 + 1):
+        for y in range(y1, y2 + 1):
+            if count % 100 == 0:  # Plot only every 100th spectrum
+                spectrum = image[y, x, :].squeeze()  # Extract the spectrum for each pixel (y, x)
+                plt.plot(wavelengths, spectrum, label=f"Pixel ({x}, {y})")
+            count += 1  # Increment the counter
+
+    # Label the plot
+    plt.title(f'Spectra of white Pixels in {samplename}')
+    plt.xlabel('Wavelength [nm]')
+    plt.ylabel('Intensity')
+    plt.show()
+
+
 def averagePlotAreas(samplename):
     # Load the image
     hdr = f"./tempImages/processed_image_{samplename}_absorbance.hdr"
@@ -28,10 +65,6 @@ def averagePlotAreas(samplename):
     for mask_file, label in masks.items():
         # Load the binary mask
         binary_mask = imread(mask_file)
-
-        # If binary_mask has multiple channels (e.g., RGB), reduce it to a single channel
-        if binary_mask.ndim == 3:
-            binary_mask = np.mean(binary_mask, axis=2)  # Convert to grayscale by averaging the channels
 
         # Ensure that the mask dimensions match the image dimensions
         if binary_mask.shape != (img.nrows, img.ncols):
