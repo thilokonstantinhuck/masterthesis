@@ -16,7 +16,7 @@ def average_spectra(imageIN, coordinates):
 
     return avg_spectra
 
-def emsc_transformation(referenceArea, samplename):
+def emscHDRcreation(referenceArea, samplename):
     # Load the hyperspectral image with absorption data
     hdr = f".\\tempImages\\processed_image_{samplename}_overlit.hdr"
     img = envi.open(hdr)

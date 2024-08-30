@@ -5,12 +5,12 @@ from sklearn.decomposition import PCA
 from matplotlib.image import imread
 
 # Load the hyperspectral image
-hdr = "tempImages/processed_image_S01_EMSC.hdr"
+hdr = "tempImages/processed_image_S02_EMSC.hdr"
 img = envi.open(hdr)
 image = img.load()
 
 # Load the binary mask
-binary_mask = imread(f"masks/binary_mask_S01_overlit.png")
+binary_mask = imread(f"masks/binary_mask_S02_combined.png")
 
 # Convert the mask to a single channel if necessary (in case of RGB)
 if binary_mask.ndim == 3:  # If the mask has multiple channels (e.g., RGB)

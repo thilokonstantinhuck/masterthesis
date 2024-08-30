@@ -3,7 +3,7 @@ filename = "S1-R-G1_SWIR_384_SN3151_9006us_2022-05-02T120939_raw_rad_float32.hdr
 samplename = "S01"
 
 #define area for white reference and background
-whiteArea = [(1900, 150), (2000, 330)]
+whiteArea = [(0, 0), (50, 330)]
 backgroundArea = [(500, 100), (1600, 350)]
 
 # Define the positions by specifying two points (top-left and bottom-right) with names
