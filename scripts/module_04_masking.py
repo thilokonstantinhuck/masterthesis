@@ -98,7 +98,7 @@ def combineMasks(samplename):
 
     print("Final combined mask created and saved successfully.")
 
-def rectangleAnalysis(samplename, rectangles,whiteArea,backgroundArea):
+def rectangleAnalysis(samplename, rectangles, backgroundArea):
 
     # Load the binary mask
     binary_mask = imread(f"./masks/binary_mask_{samplename}_combined.png")
@@ -117,10 +117,10 @@ def rectangleAnalysis(samplename, rectangles,whiteArea,backgroundArea):
         rect = patches.Rectangle((top_left[1], top_left[0]), width, height, linewidth=2, edgecolor='r', facecolor='none')
         ax.add_patch(rect)
 
-    widthWhite = whiteArea[1][1] - whiteArea[0][1]
-    heightWhite = whiteArea[1][0] - whiteArea[0][0]
-    rect = patches.Rectangle((whiteArea[0][1], whiteArea[0][0]), widthWhite, heightWhite, linewidth=2, edgecolor='b', facecolor='none')
-    ax.add_patch(rect)
+    # widthWhite = whiteArea[1][1] - whiteArea[0][1]
+    # heightWhite = whiteArea[1][0] - whiteArea[0][0]
+    # rect = patches.Rectangle((whiteArea[0][1], whiteArea[0][0]), widthWhite, heightWhite, linewidth=2, edgecolor='b', facecolor='none')
+    # ax.add_patch(rect)
 
     # Customize the plot as needed
     ax.set_title(f'Binary Mask {samplename} with Rectangles')

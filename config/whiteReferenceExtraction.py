@@ -1,0 +1,66 @@
+import spectral.io.envi as envi
+import numpy as np
+import matplotlib.pyplot as plt
+import pprint
+
+# Load the image
+hdr = "C:/SALMONDATA/SWIR_Hyspex/All_converted_file/S6-R-G1_SWIR_384_SN3151_9006us_2022-05-02T120753_raw_rad_float32.hdr"
+img = envi.open(hdr)
+image = img.load()
+
+# Retrieve the wavelengths from the header metadata
+wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
+
+#define area for white reference area
+whiteArea = ((1900, 150), (2000, 330))
+
+# Extract coordinates from whiteArea
+(y1, x1), (y2, x2) = whiteArea
+
+# Ensure coordinates are within image bounds
+height, width, bands = image.shape
+if x1 < 0 or x2 >= width or y1 < 0 or y2 >= height:
+    print("One or more coordinates are out of bounds.")
+
+count = 0  # Initialize a counter
+
+# Plot spectra for all pixels in the specified area
+plt.figure(figsize=(10, 6))
+for x in range(x1, x2 + 1):
+    for y in range(y1, y2 + 1):
+        if count % 100 == 0:  # Plot only every 100th spectrum
+            spectrum = image[y, x, :].squeeze()  # Extract the spectrum for each pixel (y, x)
+            plt.plot(wavelengths, spectrum, label=f"Pixel ({x}, {y})")
+        count += 1  # Increment the counter
+
+# Label the plot
+plt.title('Spectra of white Pixels')
+plt.xlabel('Wavelength [nm]')
+plt.ylabel('Intensity')
+plt.show()
+
+# Initialize an array to accumulate the spectra
+accumulated_spectrum = np.zeros(image.shape[2], dtype=np.float32)
+pixel_count = 0
+
+# Accumulate spectra for pixels within the binary mask
+
+for x in range(x1, x2 + 1):
+    for y in range(y1, y2 + 1):
+            spectra = image[y, x, :].squeeze()
+            accumulated_spectrum += spectra
+            pixel_count += 1
+
+# Calculate the average spectrum
+average_spectrum = accumulated_spectrum / pixel_count
+
+# Plot the average spectrum for this mask
+plt.figure(figsize=(10, 6))
+plt.plot(wavelengths, average_spectrum)
+plt.xlabel('Wavelength (nm)')
+plt.ylabel('Intensity')
+plt.title(f'Average Spectra white reference')
+
+plt.show()
+
+pprint.pprint(average_spectrum)

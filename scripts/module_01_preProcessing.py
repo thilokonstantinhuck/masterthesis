@@ -2,6 +2,7 @@ import numpy as np
 import spectral.io.envi as envi
 from PIL import Image
 from config.generalParameters import overlitDefinition
+from config.whiteReference import whiteReference
 
 def average_spectra(imageIN, coordinates):
     # Extract the coordinates
@@ -50,13 +51,10 @@ def overlit(imageFilePath, samplename):
 
     print(f"Overlit processed image {samplename} saved successfully.")
 
-def absorbanceHDRcreation(imageFilePath, samplename, referenceAreaWhite):
+def absorbanceHDRcreation(imageFilePath, samplename):
     # Load the image
     img = envi.open(imageFilePath)
     image = img.load()
-
-    # calculate reference spectrum
-    avg_white = average_spectra(image, referenceAreaWhite)
 
     # Initialize an array to hold the processed spectra
     processed_image = np.zeros_like(image)
@@ -66,7 +64,7 @@ def absorbanceHDRcreation(imageFilePath, samplename, referenceAreaWhite):
     for column in range(ncols):
         for row in range(nrows):
             spectra = image[row, column, :].squeeze()  # Get the spectra for each pixel in the column
-            processedSpectra = -np.log10(spectra / avg_white)  # Process the spectra
+            processedSpectra = -np.log10(spectra / whiteReference)  # Process the spectra
             processed_image[row, column, :] = processedSpectra  # Store the processed spectra
 
     # Save the processed image in ENVI format
