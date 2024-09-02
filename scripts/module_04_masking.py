@@ -77,7 +77,7 @@ def combineMasks(samplename):
     mask2_display[diff_mask_2] = [1, 0, 0]  # Red color for different pixels
 
     # Plotting
-    fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+    fig, axes = plt.subplots(1, 2, figsize=(7, 5))
     axes[0].imshow(mask1_display)
     axes[0].set_title(f"EMSC Mask for {samplename}")
     axes[0].axis('off')
@@ -96,7 +96,7 @@ def combineMasks(samplename):
     combined_mask_image = Image.fromarray(combined_mask_uint8, mode='L')
     combined_mask_image.save(f"./masks/binary_mask_{samplename}_combined.png")
 
-    print("Final combined mask created and saved successfully.")
+    print("Final combined mask {samplename} created and saved successfully.")
 
 def rectangleAnalysis(samplename, rectangles, backgroundArea):
 
