@@ -38,7 +38,7 @@ def emscMaskCreation(samplename):
     # Plot the ratio image
     plt.subplot(1, 2, 1)
     plt.imshow(ratio_image, cmap='gist_heat', vmin=emscMinRatio, vmax=emscMaxRatio)
-    plt.title(f'Ratio Image (between {emscWavelength1}nm and {emscWavelength2}nm)')
+    plt.title(f'Ratio Image {samplename} (between {emscWavelength1}nm and {emscWavelength2}nm)')
     plt.axis('off')
 
     # Plot the binary mask

@@ -23,8 +23,8 @@ for sample in samples:
 
     imageFilePath = os.path.join(imageFolder, config.filename)
 
-    # from scripts.module_06_visualization import areaPlotSpectra
-    # areaPlotSpectra(samplename, [(50, 150), (100, 330)])
+    from scripts.module_06_visualization import areaPlotSpectra
+    areaPlotSpectra(config.samplename, [(50, 200), (100, 380)])
     #
     # # Create absorbance image of the Spectra
     # from scripts.module_01_preProcessing import absorbanceHDRcreation
@@ -38,25 +38,25 @@ for sample in samples:
     # from scripts.module_02_emscProcessing import emscHDRcreation
     # emscHDRcreation(config.samplename)
     #
-    # # Seperate fish and background, creating a seperation mask and a plot
-    # from scripts.module_04_masking import emscMaskCreation
-    # emscMaskCreation(config.samplename)
+    # Seperate fish and background, creating a seperation mask and a plot
+    from scripts.module_04_masking import emscMaskCreation
+    emscMaskCreation(config.samplename)
     #
     # # combine masks
     # from scripts.module_04_masking import combineMasks
     # combineMasks(config.samplename)
-
-    # analyze rectangles
-    from scripts.module_04_masking import rectangleAnalysis
-    rectangleAnalysis(config.samplename, config.areasOfInterest, config.backgroundArea)
-
+    #
+    # # analyze rectangles
+    # from scripts.module_04_masking import rectangleAnalysis
+    # rectangleAnalysis(config.samplename, config.areasOfInterest, config.backgroundArea)
+    #
     # # create cut masks
     # from scripts.module_04_masking import cutMaskCreation
-    # cutMaskCreation(samplename, areasOfInterest)
+    # cutMaskCreation(config.samplename, config.areasOfInterest)
     #
     # # create average plots
     # from scripts.module_06_visualization import averagePlotAreas
-    # averagePlotAreas(samplename)
+    # averagePlotAreas(config.samplename)
 
     # create dataframe
     # from scripts.module_07_tableCreation import exportDataFrame

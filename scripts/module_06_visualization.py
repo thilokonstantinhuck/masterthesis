@@ -11,6 +11,9 @@ def areaPlotSpectra(samplename, area):
     img = envi.open(hdr)
     image = img.load()
 
+    # Load the binary mask
+    binary_mask = imread(f"./masks/binary_mask_{samplename}_emsc.png")
+
     # Retrieve the wavelengths from the header metadata
     wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
 
@@ -29,10 +32,11 @@ def areaPlotSpectra(samplename, area):
     plt.figure(figsize=(10, 6))
     for x in range(x1, x2 + 1):
         for y in range(y1, y2 + 1):
-            if count % 100 == 0:  # Plot only every 100th spectrum
-                spectrum = image[y, x, :].squeeze()  # Extract the spectrum for each pixel (y, x)
-                plt.plot(wavelengths, spectrum, label=f"Pixel ({x}, {y})")
-            count += 1  # Increment the counter
+            if binary_mask[y][x] == 1:
+                if count % 100 == 0:  # Plot only every 100th spectrum
+                    spectrum = image[y, x, :].squeeze()  # Extract the spectrum for each pixel (y, x)
+                    plt.plot(wavelengths, spectrum, label=f"Pixel ({x}, {y})")
+                count += 1  # Increment the counter
 
     # Label the plot
     plt.title(f'Spectra of every 100 Pixels in {samplename}')
@@ -48,14 +52,14 @@ def averagePlotAreas(samplename):
     image = img.load()
 
     # Define the masks and their corresponding labels
-    masks = {
-        f"./masks/binary_mask_partial_{samplename}_Tail.png": "Tail",
-        f"./masks/binary_mask_partial_{samplename}_Norwegian_Quality_Cut1.png": "Norwegian Quality Cut 1",
-        f"./masks/binary_mask_partial_{samplename}_Norwegian_Quality_Cut2.png": "Norwegian Quality Cut 2",
-        f"./masks/binary_mask_partial_{samplename}_Head.png": "Head",
-        f"./masks/binary_mask_partial_{samplename}_Belly_Fat_Trimmed.png": "Belly with Trimmed Visceral Fat",
-        f"./masks/binary_mask_{samplename}_combined.png": "Whole Fish Masked"
-    }
+    masks = [
+        (f"./masks/binary_mask_partial_{samplename}_Tail.png", "Tail", "pink"),
+        (f"./masks/binary_mask_partial_{samplename}_Norwegian_Quality_Cut1.png", "Norwegian Quality Cut 1", "blue"),
+        (f"./masks/binary_mask_partial_{samplename}_Norwegian_Quality_Cut2.png", "Norwegian Quality Cut 2", "green"),
+        (f"./masks/binary_mask_partial_{samplename}_Head.png", "Head", "purple"),
+        (f"./masks/binary_mask_partial_{samplename}_Belly_Fat_Trimmed.png", "Belly Trimmed Visceral Fat", "orange"),
+        (f"./masks/binary_mask_{samplename}_combined.png", "Whole Fish Masked", "red")
+    ]
 
     # Retrieve the wavelengths from the header metadata
     wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
@@ -63,13 +67,12 @@ def averagePlotAreas(samplename):
     plt.figure(figsize=(12, 8))
 
     # Loop through each mask, calculate the average spectrum, and plot
-    for mask_file, label in masks.items():
+    for mask in masks:
+        mask_file = mask[0]
+        mask_label = mask[1]
+        mask_color = mask[2]
         # Load the binary mask
         binary_mask = imread(mask_file)
-
-        # Ensure that the mask dimensions match the image dimensions
-        if binary_mask.shape != (img.nrows, img.ncols):
-            raise ValueError(f"The binary mask dimensions for {label} do not match the image dimensions.")
 
         # Initialize an array to accumulate the spectra
         accumulated_spectra = np.zeros(image.shape[2], dtype=np.float32)
@@ -96,7 +99,7 @@ def averagePlotAreas(samplename):
         average_spectrum = accumulated_spectra / pixel_count
 
         # Plot the average spectrum for this mask
-        plt.plot(wavelengths, average_spectrum, label=label)
+        plt.plot(wavelengths, average_spectrum, label=mask_label, color=mask_color)
 
     # Adding labels, title, grid, and legend
     plt.xlabel('Wavelength (nm)')
@@ -104,9 +107,6 @@ def averagePlotAreas(samplename):
     plt.title(f'Average Spectra for Different Regions Sample {samplename}')
     plt.grid(True)
     plt.legend()
-
-    # Set the y-axis minimum to 0
-    # plt.ylim(bottom=0)
 
     # Save the plot with high resolution
     plt.savefig(f"./plots/plot_{samplename}_all_regions_averages.png", dpi=1000)
