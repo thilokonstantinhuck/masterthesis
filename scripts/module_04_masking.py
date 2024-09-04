@@ -4,7 +4,7 @@ from matplotlib.image import imread
 import matplotlib.patches as patches
 import numpy as np
 from PIL import Image
-from config.generalParameters import emscMinRatio, emscMaxRatio, emscWavelength1, emscWavelength2
+from config.generalParameters import emscMinRatio, emscMaxRatio, emscWavelength1, emscWavelength2, lowlightWavelength, lowlightDefinition
 
 def emscMaskCreation(samplename):
     # Load the hyperspectral image with absorption data
@@ -60,24 +60,31 @@ def combineMasks(samplename):
     # Load the binary masks
     binary_mask_overlit = imread(f"./masks/binary_mask_{samplename}_overlit.png")
     binary_mask_emsc = imread(f"./masks/binary_mask_{samplename}_emsc.png")
+    binary_mask_lowlight = imread(f"./masks/binary_mask_{samplename}_lowlight.png")
 
     # Combine the masks
-    combined_mask = binary_mask_emsc * binary_mask_overlit
+    combined_mask = binary_mask_emsc * binary_mask_overlit * binary_mask_lowlight
 
-    # Find the pixels where the masks differ
-    diff_mask_1 = np.logical_and(binary_mask_emsc == 1, binary_mask_overlit == 0)
-    diff_mask_2 = np.logical_and(binary_mask_emsc == 0, binary_mask_overlit == 1)
+    # Find the pixels where each mask differs (i.e., where a mask has value 0 while others are 1)
+    diff_mask_emsc = np.logical_and(binary_mask_emsc == 0,
+                                    np.logical_or(binary_mask_overlit == 1, binary_mask_lowlight == 1))
+    diff_mask_overlit = np.logical_and(binary_mask_overlit == 0,
+                                       np.logical_or(binary_mask_emsc == 1, binary_mask_lowlight == 1))
+    diff_mask_lowlight = np.logical_and(binary_mask_lowlight == 0,
+                                        np.logical_or(binary_mask_emsc == 1, binary_mask_overlit == 1))
 
     # Prepare the images for plotting
     mask1_display = np.stack([binary_mask_emsc, binary_mask_emsc, binary_mask_emsc], axis=-1)
     mask2_display = np.stack([binary_mask_overlit, binary_mask_overlit, binary_mask_overlit], axis=-1)
+    mask3_display = np.stack([binary_mask_lowlight, binary_mask_lowlight, binary_mask_lowlight], axis=-1)
 
-    # Highlight the differences in red
-    mask1_display[diff_mask_1] = [1, 0, 0]  # Red color for different pixels
-    mask2_display[diff_mask_2] = [1, 0, 0]  # Red color for different pixels
+    # Highlight the differences in red for each mask
+    mask1_display[diff_mask_emsc] = [1, 0, 0]  # Red color for different pixels in EMSC mask
+    mask2_display[diff_mask_overlit] = [1, 0, 0]  # Red color for different pixels in Overlit mask
+    mask3_display[diff_mask_lowlight] = [1, 0, 0]  # Red color for different pixels in Lowlight mask
 
     # Plotting
-    fig, axes = plt.subplots(1, 2, figsize=(7, 5))
+    fig, axes = plt.subplots(1, 3, figsize=(10, 5))
     axes[0].imshow(mask1_display)
     axes[0].set_title(f"EMSC Mask for {samplename}")
     axes[0].axis('off')
@@ -85,6 +92,10 @@ def combineMasks(samplename):
     axes[1].imshow(mask2_display)
     axes[1].set_title(f"Overlit Mask for {samplename}")
     axes[1].axis('off')
+
+    axes[2].imshow(mask3_display)
+    axes[2].set_title(f"Lowlight Mask for {samplename}")
+    axes[2].axis('off')
 
     plt.savefig(f"./plots/plot_{samplename}_mask_combination_analysis.png", dpi=1000)
     plt.show()
@@ -96,7 +107,7 @@ def combineMasks(samplename):
     combined_mask_image = Image.fromarray(combined_mask_uint8, mode='L')
     combined_mask_image.save(f"./masks/binary_mask_{samplename}_combined.png")
 
-    print("Final combined mask {samplename} created and saved successfully.")
+    print(f"Final combined mask {samplename} created and saved successfully.")
 
 def rectangleAnalysis(samplename, rectangles, backgroundArea):
 
@@ -153,3 +164,43 @@ def cutMaskCreation(samplename, rectangles):
         mask_image.save(f"./masks/binary_mask_partial_{samplename}_{name}.png")
 
         print(f"Mask for {samplename} {name} saved")
+
+
+def lowlightMaskCreation(samplename, lowlightWavelength=1080, lowlightDefinition=0.05):
+    # Load the hyperspectral image with absorption data
+    hdr = f"./tempImages/processed_image_{samplename}_overlit.hdr"
+    img = envi.open(hdr)
+    image = img.load()
+
+    # Retrieve the wavelengths from the header metadata
+    wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
+
+    # Find the index of the specified lowlight wavelength
+    index = np.argmin(np.abs(wavelengths - lowlightWavelength))
+
+    # Ensure the array is explicitly cast to the same type
+    lowlight_data = np.array(image[:, :, index], dtype=np.float32)
+
+    # Create a binary mask where the values are below the lowlightDefinition
+    lowlight_mask = np.where(lowlight_data < lowlightDefinition, 0, 1).astype(np.uint8) * 255
+
+    # Ensure lowlight_mask is a 2D array
+    if lowlight_mask.ndim == 3 and lowlight_mask.shape[-1] == 1:
+        lowlight_mask = lowlight_mask.squeeze(axis=-1)
+
+    # Display the lowlight mask
+    plt.figure(figsize=(6, 6))
+    plt.imshow(lowlight_mask, cmap='gray')
+    plt.title(f'Lowlight Mask {samplename} (Wavelength {lowlightWavelength}nm)')
+    plt.axis('off')
+
+    # Save the plot as an image file
+    plt.savefig(f"./plots/plot_{samplename}_lowlight_mask.png", dpi=1000)
+    plt.show()
+
+    # Convert the mask to an image and save as PNG
+    mask_image = Image.fromarray(lowlight_mask, mode='L')
+    mask_image.save(f"./masks/binary_mask_{samplename}_lowlight.png")
+
+    print(f"Lowlight mask for {samplename} saved successfully.")
+

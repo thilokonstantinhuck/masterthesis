@@ -4,7 +4,7 @@ imageFolder = r"C:\SALMONDATA\SWIR_Hyspex\All_converted_file"
 
 # Settings Lighting Detection
 overlitDefinition = 0.75
-lowlightDefinition = 0.05
+lowlightDefinition = 0.03
 lowlightWavelength = 1080
 
 # Settings EMSC

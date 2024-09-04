@@ -65,6 +65,7 @@ def absorbanceHDRcreation(imageFilePath, samplename):
         for row in range(nrows):
             spectra = image[row, column, :].squeeze()  # Get the spectra for each pixel in the column
             processedSpectra = -np.log10(spectra / whiteReference)  # Process the spectra
+            processedSpectra[np.isinf(processedSpectra)] = 5 # Replace inf values with 5
             processed_image[row, column, :] = processedSpectra  # Store the processed spectra
 
     # Save the processed image in ENVI format

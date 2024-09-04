@@ -7,12 +7,13 @@ import math
 
 def areaPlotSpectra(samplename, area):
     # Load the image
-    hdr = f"./tempImages/processed_image_{samplename}_overlit.hdr"
+    hdr = (f"./tempImages/processed_image_{samplename}_absorbance_EMSC"
+           f".hdr")
     img = envi.open(hdr)
     image = img.load()
 
     # Load the binary mask
-    binary_mask = imread(f"./masks/binary_mask_{samplename}_emsc.png")
+    binary_mask = imread(f"./masks/binary_mask_{samplename}_combined.png")
 
     # Retrieve the wavelengths from the header metadata
     wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
@@ -47,7 +48,7 @@ def areaPlotSpectra(samplename, area):
 
 def averagePlotAreas(samplename):
     # Load the image
-    hdr = f"./tempImages/processed_image_{samplename}_absorbance.hdr"
+    hdr = f"./tempImages/processed_image_{samplename}_absorbance_EMSC.hdr"
     img = envi.open(hdr)
     image = img.load()
 
@@ -106,7 +107,8 @@ def averagePlotAreas(samplename):
     plt.ylabel('Absorbance')
     plt.title(f'Average Spectra for Different Regions Sample {samplename}')
     plt.grid(True)
-    plt.legend()
+    plt.ylim(0, 2.8)  # Set the upper y-limit manually
+    plt.legend(loc='lower right')
 
     # Save the plot with high resolution
     plt.savefig(f"./plots/plot_{samplename}_all_regions_averages.png", dpi=1000)
