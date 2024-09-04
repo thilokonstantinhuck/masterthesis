@@ -1,11 +1,15 @@
 from config.generalParameters import imageFolder, lowlightDefinition
 import importlib
 import os
+from config.generalParameters import emscWavelength1, emscWL1min, emscWL1max
+from config.generalParameters import emscWavelength2, emscWL2min, emscWL2max
+from config.generalParameters import emscWavelength3, emscWL3min, emscWL3max
+from config.samples.S06 import samplename
 
 # List of sample names
 samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10",
            "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
-# samples = ["S01"]
+samples = ["S01"]
 
 
 
@@ -40,22 +44,25 @@ for sample in samples:
     # # Run EMSC on the absorbance data
     # from scripts.module_02_emscProcessing import emscAbsorbanceHDRcreation
     # emscAbsorbanceHDRcreation(config.samplename)
-
-    # # show spectra
-    # from scripts.module_06_visualization import areaPlotSpectra
-    # areaPlotSpectra(config.samplename, [(500, 100), (600, 200)])
-    #
-    # # Seperate fish and background, creating a seperation mask and a plot
-    # from scripts.module_04_masking import emscMaskCreation
-    # emscMaskCreation(config.samplename)
     #
     # # create lowlight mask
     # from scripts.module_04_masking import lowlightMaskCreation
     # lowlightMaskCreation(config.samplename)
+
+    # # Seperate fish and background, creating a seperation mask and a plot
+    # from scripts.module_04_masking import emscMaskCreation, combineEMSCMasks
+    # emscMaskCreation(config.samplename,emscWavelength1,emscWL1min,emscWL1max)
+    # emscMaskCreation(config.samplename, emscWavelength2, emscWL2min, emscWL2max)
+    # emscMaskCreation(config.samplename, emscWavelength3, emscWL3min, emscWL3max)
+    # combineEMSCMasks(config.samplename)
     #
     # # combine masks
     # from scripts.module_04_masking import combineMasks
     # combineMasks(config.samplename)
+    #
+    # # show spectra
+    # from scripts.module_06_visualization import areaPlotSpectra
+    # areaPlotSpectra(config.samplename, [(0, 0), (2000, 380)])
     #
     # # analyze rectangles
     # from scripts.module_04_masking import rectangleAnalysis
@@ -64,12 +71,12 @@ for sample in samples:
     # # create cut masks
     # from scripts.module_04_masking import cutMaskCreation
     # cutMaskCreation(config.samplename, config.areasOfInterest)
-    #
-    # create average plots
-    from scripts.module_06_visualization import averagePlotAreas
-    averagePlotAreas(config.samplename)
 
-    # create dataframe
-    # from scripts.module_07_tableCreation import exportDataFrame
-    # exportDataFrame()
+    # # create average plots
+    # from scripts.module_06_visualization import averagePlotAreas
+    # averagePlotAreas(config.samplename)
+
+# create dataframe
+from scripts.module_07_tableCreation import exportDataFrame
+exportDataFrame()
 

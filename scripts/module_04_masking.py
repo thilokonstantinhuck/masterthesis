@@ -4,11 +4,12 @@ from matplotlib.image import imread
 import matplotlib.patches as patches
 import numpy as np
 from PIL import Image
-from config.generalParameters import emscMinRatio, emscMaxRatio, emscWavelength1, emscWavelength2, lowlightWavelength, lowlightDefinition
+from config.generalParameters import lowlightWavelength, lowlightDefinition
+from config.generalParameters import emscWavelength1, emscWavelength2, emscWavelength3
 
-def emscMaskCreation(samplename):
+def emscMaskCreation(samplename,emscWavelength, wlMin, wlMax):
     # Load the hyperspectral image with absorption data
-    hdr = f"./tempImages/processed_image_{samplename}_EMSC.hdr"
+    hdr = f"./tempImages/processed_image_{samplename}_absorbance_EMSC.hdr"
     img = envi.open(hdr)
     image = img.load()
 
@@ -16,45 +17,57 @@ def emscMaskCreation(samplename):
     wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
 
     # Find the indices of the specified wavelengths
-    index1 = np.argmin(np.abs(wavelengths - emscWavelength1))
-    index2 = np.argmin(np.abs(wavelengths - emscWavelength2))
+    index = np.argmin(np.abs(wavelengths - emscWavelength))
 
     # Ensure the arrays are explicitly cast to the same type
-    index1_data = np.array(image[:, :, index1], dtype=np.float32)
-    index2_data = np.array(image[:, :, index2], dtype=np.float32)
-
-    # Calculate the ratio of absorbance at the two wavelengths for each pixel
-    ratio_image = np.divide(index2_data, index1_data)  # Use np.divide to calculate the ratio
+    index_data = np.array(image[:, :, index], dtype=np.float32)
 
     # Ensure that ratio_image is 2D
-    ratio_image = np.squeeze(ratio_image)  # Remove any singleton dimensions
+    index_image = np.squeeze(index_data)  # Remove any singleton dimensions
 
     # Create a binary mask based on the minRatio and maxRatio
-    binary_mask = np.where((ratio_image >= emscMinRatio) & (ratio_image <= emscMaxRatio), 1, 0).astype(np.uint8) * 255
+    binary_mask = np.where((index_image >= wlMin) & (index_image <= wlMax), 1, 0).astype(np.uint8) * 255
 
     # Display the ratio image and the binary mask side by side
     plt.figure(figsize=(10, 7))
 
     # Plot the ratio image
     plt.subplot(1, 2, 1)
-    plt.imshow(ratio_image, cmap='gist_heat', vmin=emscMinRatio, vmax=emscMaxRatio)
-    plt.title(f'Ratio Image {samplename} (between {emscWavelength1}nm and {emscWavelength2}nm)')
+    plt.imshow(index_image, cmap='gist_heat', vmin=wlMin, vmax=wlMax)
+    plt.title(f'Image {samplename} at {emscWavelength} between {wlMin} and {wlMax}')
     plt.axis('off')
 
     # Plot the binary mask
     plt.subplot(1, 2, 2)
     plt.imshow(binary_mask, cmap='gray')
-    plt.title(f'Binary Mask (Ratio between {emscMinRatio} and {emscMaxRatio})')
+    plt.title(f'Binary Mask {samplename} at {emscWavelength}')
     plt.axis('off')
 
     # Show the plot
-    plt.savefig(f"./plots/plot_{samplename}_emsc_mask.png", dpi=1000)
+    plt.savefig(f"./plots/plot_{samplename}_emsc_mask_{emscWavelength}.png", dpi=1000)
     plt.show()
 
     # Convert the mask to an image and save as PNG
     mask_image = Image.fromarray(binary_mask)
-    mask_image.save(f"./masks/binary_mask_{samplename}_emsc.png")
-    print(f"EMSC mask {samplename} saved successfully.")
+    mask_image.save(f"./masks/binary_mask_{samplename}_emsc_{emscWavelength}.png")
+    print(f"EMSC mask {samplename} {emscWavelength}nm saved successfully.")
+def combineEMSCMasks(samplename):
+    # Load the binary masks
+    binary_mask_emsc1 = imread(f"./masks/binary_mask_{samplename}_emsc_{emscWavelength1}.png")
+    binary_mask_emsc2 = imread(f"./masks/binary_mask_{samplename}_emsc_{emscWavelength2}.png")
+    binary_mask_emsc3 = imread(f"./masks/binary_mask_{samplename}_emsc_{emscWavelength3}.png")
+
+    # Combine the masks
+    combined_mask = binary_mask_emsc1 * binary_mask_emsc2 * binary_mask_emsc3
+
+    # Convert the combined mask to uint8 format for saving
+    combined_mask_uint8 = (combined_mask * 255).astype(np.uint8)
+
+    # Save the final combined mask as a grayscale image using PIL
+    combined_mask_image = Image.fromarray(combined_mask_uint8, mode='L')
+    combined_mask_image.save(f"./masks/binary_mask_{samplename}_emsc.png")
+
+    print(f"Combined emsc mask {samplename} created and saved successfully.")
 
 def combineMasks(samplename):
     # Load the binary masks
@@ -166,9 +179,9 @@ def cutMaskCreation(samplename, rectangles):
         print(f"Mask for {samplename} {name} saved")
 
 
-def lowlightMaskCreation(samplename, lowlightWavelength=1080, lowlightDefinition=0.05):
+def lowlightMaskCreation(samplename):
     # Load the hyperspectral image with absorption data
-    hdr = f"./tempImages/processed_image_{samplename}_overlit.hdr"
+    hdr = f"./tempImages/processed_image_{samplename}_absorbance_EMSC.hdr"
     img = envi.open(hdr)
     image = img.load()
 

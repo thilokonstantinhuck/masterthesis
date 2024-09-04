@@ -7,8 +7,7 @@ import math
 
 def areaPlotSpectra(samplename, area):
     # Load the image
-    hdr = (f"./tempImages/processed_image_{samplename}_absorbance_EMSC"
-           f".hdr")
+    hdr = (f"./tempImages/processed_image_{samplename}_absorbance_EMSC.hdr")
     img = envi.open(hdr)
     image = img.load()
 
@@ -42,7 +41,8 @@ def areaPlotSpectra(samplename, area):
     # Label the plot
     plt.title(f'Spectra of every 100 Pixels in {samplename}')
     plt.xlabel('Wavelength [nm]')
-    plt.ylabel('Intensity')
+    plt.ylabel('Absorbance')
+    plt.ylim(top=5, bottom=-0.5)
     plt.show()
 
 

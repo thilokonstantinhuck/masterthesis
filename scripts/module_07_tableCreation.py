@@ -6,7 +6,10 @@ import math
 import pandas as pd
 
 def exportDataFrame():
-    samples = ["S01", "S02", "S03", "S05", "S06", "S07"]
+    # List of sample names
+    samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10",
+               "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
+    # samples = ["S01"]
 
     dfList = []
 
@@ -16,8 +19,10 @@ def exportDataFrame():
     # Concatenate all DataFrames into one
     final_df = pd.concat(dfList, ignore_index=True)
 
-    # Print the final DataFrame
-    print(final_df)
+    # Export the final DataFrame to a CSV file
+    final_df.to_csv(f'./data/exported_data.csv', index=False)
+
+    print("Data exported successfully to exported_data.csv")
 
 def createDataFrame(samplename):
     # Load the image
