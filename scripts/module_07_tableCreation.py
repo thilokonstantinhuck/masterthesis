@@ -39,11 +39,11 @@ def createDataFrame(samplename):
 
     # Define the masks and their corresponding labels
     masks = {
-        f"./masks/binary_mask_partial_{samplename}_Tail.png": "T",
         f"./masks/binary_mask_partial_{samplename}_Norwegian_Quality_Cut1.png": "NQC1",
         f"./masks/binary_mask_partial_{samplename}_Norwegian_Quality_Cut2.png": "NQC2",
+        f"./masks/binary_mask_partial_{samplename}_Belly_Fat_Trimmed.png": "F2",
         f"./masks/binary_mask_partial_{samplename}_Head.png": "H",
-        f"./masks/binary_mask_partial_{samplename}_Belly_Fat_Trimmed.png": "F2"
+        f"./masks/binary_mask_partial_{samplename}_Tail.png": "T"
     }
 
     # Loop through each mask, calculate the average spectrum, and save in table
