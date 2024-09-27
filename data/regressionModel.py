@@ -9,16 +9,27 @@ from sklearn.metrics import mean_squared_error, r2_score
 file_path = 'dataEdited.csv'
 data = pd.read_csv(file_path)
 
-# Data Preprocessing
-# Select hyperspectral data (from the 5th column onward) and target variable (C20:5n3)
-X = data.iloc[:, 4:].values  # Hyperspectral data
-y = data['C20:5n3'].values   # Target variable
+# Define the sample name to split off for the test set
+sample_name = 'S03'
 
-# Train-test split (80% train, 20% test)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Split off the test set where Fish ID is equal to the sample name "S08"
+test_set = data[data['Fish ID'] == sample_name]
+
+# The remaining data will be used for training and validation
+train_val_set = data[data['Fish ID'] != sample_name]
+
+# Extract the hyperspectral data (from 5th column onward) and target variable (C20:5n3)
+X = train_val_set.iloc[:, 4:].values  # Hyperspectral data for training and validation
+y = train_val_set['C20:5n3'].values   # Target variable for training and validation
+
+X_test = test_set.iloc[:, 4:].values            # Hyperspectral data for test set
+y_test = test_set['C20:5n3'].values             # Target variable for test set
+
+# Train-test split (90% train, 10% test)
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, random_state=42)
 
 # Implementing Ridge Regression with Cross-Validation
-ridge_model = Ridge(alpha=0.001)  # You can tune alpha based on your needs
+ridge_model = Ridge(alpha=0.0001)  # You can tune alpha based on your needs
 kf = KFold(n_splits=5, shuffle=True, random_state=44)
 
 # Perform cross-validation
@@ -29,7 +40,7 @@ std_cv_mse = np.std(cv_scores)
 print(f"Mean CV MSE: {mean_cv_mse}, Std CV MSE: {std_cv_mse}")
 
 # Train the Ridge model on the full training set
-ridge_model.fit(X_train, y_train)
+ridge_model.fit(X, y)
 
 # Make predictions on the test set
 y_pred_ridge = ridge_model.predict(X_test)
