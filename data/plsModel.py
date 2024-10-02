@@ -9,61 +9,59 @@ from sklearn.linear_model import LinearRegression
 # Load the data
 file_path = 'dataEdited.csv'
 data = pd.read_csv(file_path)
+data = data[data['Fish ID'].isin(["S01", "S02", "S03", "S04", "S05", "S06"])]
 
 # Define the sample name to split off for the test set
-sample_name = 'S03'
+sample_name = 'S06'
 position = "NQC1"
 
-# Split off the test set where Fish ID is equal to the sample name "S06"
-# test_set = data[(data['Fish ID'] == sample_name) & (data['Position'] == position)]
+# Split off the test set where Fish ID is equal to the sample name
 test_set = data[data['Fish ID'] == sample_name]
 
 # The remaining data will be used for training and validation
-# train_val_set = data[(data['Fish ID'] != sample_name) & (data['Position'] == position)]
 train_val_set = data[data['Fish ID'] != sample_name]
 
 # Extract the hyperspectral data (from 5th column onward) and target variable (C20:5n3)
-X = train_val_set.iloc[:, 4:].values  # Hyperspectral data for training and validation
+X = train_val_set.iloc[:, 44:].values  # Hyperspectral data for training and validation
 y = train_val_set['C20:5n3'].values  # Target variable for training and validation
 
-X_test = test_set.iloc[:, 4:].values  # Hyperspectral data for test set
+X_test = test_set.iloc[:, 44:].values  # Hyperspectral data for test set
 y_test = test_set['C20:5n3'].values  # Target variable for test set
 
-# Train-test split (90% train, 10% test)
+# Train-test split (90% train, 10% validation)
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, random_state=42)
 
 # Implementing PLS Regression with Cross-Validation
-pls_model = PLSRegression(n_components=10)  # You can adjust n_components based on the data
-
-kf = KFold(n_splits=5, shuffle=True, random_state=44)
+pls_model = PLSRegression(n_components=10)  # Adjust n_components based on your data
 
 # Perform cross-validation for PLS
-cv_scores_pls = cross_val_score(pls_model, X, y, cv=kf, scoring='neg_mean_squared_error')
+kf = KFold(n_splits=5, shuffle=True, random_state=44)
+cv_scores_pls = cross_val_score(pls_model, X_train, y_train, cv=kf, scoring='neg_mean_squared_error')
 mean_cv_mse_pls = -np.mean(cv_scores_pls)
 std_cv_mse_pls = np.std(cv_scores_pls)
 
 print(f"Mean CV MSE (PLS): {mean_cv_mse_pls}, Std CV MSE (PLS): {std_cv_mse_pls}")
 
-# Train the PLS model on the full training set
-pls_model.fit(X, y)
+# Train the PLS model on the training set
+pls_model.fit(X_train, y_train)
 
-# Make predictions on the test set using PLS
-y_pred_pls = pls_model.predict(X_test).ravel()
+# Make predictions on the validation set using PLS
+y_pred_val = pls_model.predict(X_val).ravel()
 
-# Evaluate the performance on the test set for PLS (Before Slope and Bias Correction)
-mse_test_pls = mean_squared_error(y_test, y_pred_pls)
-r2_test_pls = r2_score(y_test, y_pred_pls)
-mae_test_pls = mean_absolute_error(y_test, y_pred_pls)
+# Evaluate the performance on the validation set for PLS (Before Slope and Bias Correction)
+mse_val_pls = mean_squared_error(y_val, y_pred_val)
+r2_val_pls = r2_score(y_val, y_pred_val)
+mae_val_pls = mean_absolute_error(y_val, y_pred_val)
 
-print(f"Test MSE (PLS): {mse_test_pls}")
-print(f"Test R^2 (PLS): {r2_test_pls}")
-print(f"Test MAE (PLS): {mae_test_pls}")
+print(f"Validation MSE (PLS): {mse_val_pls}")
+print(f"Validation R^2 (PLS): {r2_val_pls}")
+print(f"Validation MAE (PLS): {mae_val_pls}")
 
-# Slope and Bias Correction using Linear Regression
+# Slope and Bias Correction using the Validation Set
 linear_model = LinearRegression()
 
-# Fit the linear regression model using predicted values to correct slope and bias
-linear_model.fit(y_pred_pls.reshape(-1, 1), y_test)
+# Fit the linear regression model using validation set predictions and actual values
+linear_model.fit(y_pred_val.reshape(-1, 1), y_val)
 
 # Extract slope (coefficient) and bias (intercept)
 slope = linear_model.coef_[0]
@@ -72,13 +70,24 @@ bias = linear_model.intercept_
 print(f"Slope (correction factor): {slope}")
 print(f"Bias (intercept): {bias}")
 
-# Apply the slope and bias correction
+# Make predictions on the test set using PLS (Before Slope and Bias Correction)
+y_pred_pls = pls_model.predict(X_test).ravel()
+
+# Apply the slope and bias correction (Using slope and bias from validation)
 y_pred_corrected = slope * y_pred_pls + bias
 
-# Evaluate the corrected predictions
+# Evaluate the performance on the test set for PLS (Before and After Correction)
+mse_test_pls = mean_squared_error(y_test, y_pred_pls)
+r2_test_pls = r2_score(y_test, y_pred_pls)
+mae_test_pls = mean_absolute_error(y_test, y_pred_pls)
+
 mse_corrected = mean_squared_error(y_test, y_pred_corrected)
 r2_corrected = r2_score(y_test, y_pred_corrected)
 mae_corrected = mean_absolute_error(y_test, y_pred_corrected)
+
+print(f"Test MSE (PLS): {mse_test_pls}")
+print(f"Test R^2 (PLS): {r2_test_pls}")
+print(f"Test MAE (PLS): {mae_test_pls}")
 
 print(f"Corrected Test MSE: {mse_corrected}")
 print(f"Corrected Test R^2: {r2_corrected}")
@@ -106,7 +115,7 @@ plt.title("Residuals Plot (Test Set) - PLS (Corrected)")
 plt.show()
 
 # Assuming the 5th column onward are the hyperspectral data columns (wavelengths), extract those column names as wavelengths
-wavelengths = train_val_set.columns[4:]  # Adjust this if necessary to match your data structure
+wavelengths = train_val_set.columns[44:]  # Adjust this if necessary to match your data structure
 
 # Get the coefficients from the PLS model
 pls_coefficients = pls_model.coef_.ravel()
@@ -117,7 +126,8 @@ plt.plot(wavelengths, pls_coefficients, label="PLS Coefficients", color='blue', 
 plt.xlabel("Wavelengths")
 plt.ylabel("Regression Coefficients")
 plt.title("PLS Regression Coefficients")
-plt.xticks(rotation=90)  # Rotate x-axis labels if wavelengths are long
-plt.legend()
+tick_frequency = 20  # Change this value to show more or fewer ticks
+rounded_wavelengths = np.round(wavelengths.astype(float)).astype(int)  # Ensure rounding to nearest integer
+plt.xticks(np.arange(0, len(wavelengths), step=tick_frequency), rounded_wavelengths[::tick_frequency])
 plt.tight_layout()
 plt.show()
