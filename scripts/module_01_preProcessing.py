@@ -42,7 +42,7 @@ def overlit(imageFilePath, samplename):
             # Check if any channel in this pixel exceeds the overlitDefinition
             if np.any(image[row, column, :] > overlitDefinition):
                 # Set all channels for this pixel to 1
-                processed_image[row, column, :] = 1.0
+                processed_image[row, column, :] = 2.0
 
     # Save the processed image in ENVI format
     output_hdr = f"./tempImages/processed_image_{samplename}_overlit.hdr"
