@@ -320,3 +320,31 @@ def emscPicture(samplename, emscWavelength, wlMin, wlMax):
     emsc_image = Image.fromarray((index_image * 255).astype(np.uint8))
     emsc_image.save(f"./plots/plot_{samplename}_emsc.png")
     print(f"EMSC Picture {samplename} {emscWavelength}nm saved successfully.")
+
+def fineCutMaskCreation(samplename, centerPoints):
+    # Load the binary mask
+    binary_mask = imread(f"./masks/binary_mask_{samplename}_combined.png")
+
+    # Draw each rectangle
+    subsquare_size = 25  # Example predefined width and height
+    numberOfSubsquares = 5
+
+    for top_left, name in centerPoints:
+        for row in range(numberOfSubsquares):
+            for col in range(numberOfSubsquares):
+                # Create a mask of the same dimensions as the original binary mask
+                mask = np.zeros_like(binary_mask)
+                squareID = (row*5)+col
+                x = top_left[1]+col*subsquare_size
+                y = top_left[0]+row*subsquare_size
+                # Fill in the rectangle area with the original mask's values
+                mask[y:y+subsquare_size, x:x+subsquare_size] = binary_mask[y:y+subsquare_size, x:x+subsquare_size]
+
+                # Convert the mask to uint8 (assuming mask is binary)
+                mask = (mask * 255).astype(np.uint8)
+
+                # Convert the mask to an image and save as PNG
+                mask_image = Image.fromarray(mask)
+                mask_image.save(f"./masks/binary_mask_partial_{samplename}_{name}_{squareID}.png")
+
+                print(f"Mask for {samplename} {name} {squareID} saved")

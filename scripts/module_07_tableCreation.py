@@ -7,8 +7,7 @@ import pandas as pd
 
 def exportDataFrame():
     # List of sample names
-    samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10",
-               "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
+    samples = ["S01", "S02", "S03", "S04", "S05", "S06"]
     # samples = ["S01"]
 
     dfList = []
@@ -26,16 +25,14 @@ def exportDataFrame():
 
 def createDataFrame(samplename):
     # Load the image
-    hdr = f"./tempImages/processed_image_{samplename}_absorbance.hdr"
+    hdr = f"./tempImages/processed_image_{samplename}_absorbance_EMSC.hdr"
     img = envi.open(hdr)
     image = img.load()
-
 
     # Retrieve the wavelengths from the header metadata
     wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
 
     rows = []
-
 
     # Define the masks and their corresponding labels
     masks = {
@@ -69,8 +66,7 @@ def createDataFrame(samplename):
                         discarded_count += 1
 
         # print discarded and pixels
-        print(f"Number of valid pixels: {pixel_count}")
-        print(f"Number of discarded pixels: {discarded_count}")
+        print(f"Number of valid/discarded pixels: {pixel_count} / {discarded_count}")
 
         # Calculate the average spectrum
         average_spectrum = accumulated_spectra / pixel_count
