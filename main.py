@@ -68,13 +68,14 @@ for sample in samples:
     # from scripts.module_04_masking import rectangleAnalysis
     # rectangleAnalysis(config.samplename, config.areasOfInterest, config.backgroundArea)
     #
-    from scripts.module_04_masking import fineMasking, emscPicture, fineCutMaskCreation
-    emscPicture(config.samplename,emscWavelength1,emscWL1min,emscWL1max)
-    fineMasking(config.samplename, config.areasOfInterest)
-    fineCutMaskCreation(config.samplename, config.areasOfInterest)
+    # from scripts.module_04_masking import fineMasking, emscPicture, fineCutMaskCreation
+    # emscPicture(config.samplename,emscWavelength1,emscWL1min,emscWL1max)
+    # fineMasking(config.samplename, config.areasOfInterest)
+    # fineCutMaskCreation(config.samplename, config.areasOfInterest)
+    #
+    # from scripts.module_06_visualization import fineAveragePlotAreas
+    # fineAveragePlotAreas(config.samplename)
 
-    from scripts.module_06_visualization import fineAveragePlotAreas
-    fineAveragePlotAreas(config.samplename)
     # # create cut masks
     # from scripts.module_04_masking import cutMaskCreation
     # cutMaskCreation(config.samplename, config.areasOfInterest)
@@ -84,6 +85,6 @@ for sample in samples:
     # averagePlotAreas(config.samplename)
 
 # create dataframe
-# from scripts.module_07_tableCreation import exportDataFrame
-# exportDataFrame()
+from scripts.module_07_tableCreation import exportDataFrame
+exportDataFrame()
 
