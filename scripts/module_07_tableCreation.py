@@ -9,7 +9,6 @@ import pandas as pd
 def exportDataFrame():
     # List of sample names
     samples = ["S01", "S02", "S03", "S04", "S05", "S06"]
-    samples = ["S01"]
 
     dfList = []
 
@@ -47,6 +46,7 @@ def createDataFrameAutomatic(samplename):
 
     # Loop through each mask, calculate the average spectrum, and save in table
     for pos in positions:
+        print(f"({pos})({samplename})")
         for fineMask in range(25):
             # Load the binary mask
             maskPathFull = maskPath + "_" + samplename + "_" + pos + "_" + str(fineMask) + ".png"
