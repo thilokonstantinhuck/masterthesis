@@ -41,15 +41,15 @@ for sample in samples:
     # from scripts.module_04_masking import combineMasksNoEMSC
     # combineMasksNoEMSC(config.samplename)
 
-    # 4 adjust and create finemasks
-    from scripts.module_04_masking import fineMasking, emscPicture, fineCutMaskCreation
-    emscPicture(config.samplename,emscWavelength1,emscWL1min,emscWL1max)
-    fineMasking(config.samplename, config.areasOfInterest)
-    fineCutMaskCreation(config.samplename, config.areasOfInterest)
-#
-#     # 5 plot average spectra
-#     from scripts.module_06_visualization import fineAveragePlotAreas
-#     fineAveragePlotAreas(config.samplename)
+    # # 4 adjust and create finemasks
+    # from scripts.module_04_masking import fineMasking, emscPicture, fineCutMaskCreation
+    # emscPicture(config.samplename,emscWavelength1,emscWL1min,emscWL1max)
+    # fineMasking(config.samplename, config.areasOfInterest)
+    # fineCutMaskCreation(config.samplename, config.areasOfInterest)
+
+    # 5 plot average spectra
+    from scripts.module_06_visualization import fineAveragePlotAreas
+    fineAveragePlotAreas(config.samplename)
 #
 # # create dataframe
 # from scripts.module_07_tableCreation import exportDataFrame

@@ -125,11 +125,11 @@ def fineAveragePlotAreas(samplename):
 
     # Define the masks and their corresponding labels
     masks = [
-        (f"./masks/binary_mask_partial_{samplename}_Tail", "Tail", "pink"),
-        (f"./masks/binary_mask_partial_{samplename}_Norwegian_Quality_Cut1", "Norwegian Quality Cut 1", "blue"),
-        (f"./masks/binary_mask_partial_{samplename}_Norwegian_Quality_Cut2", "Norwegian Quality Cut 2", "green"),
-        (f"./masks/binary_mask_partial_{samplename}_Head", "Head", "purple"),
-        (f"./masks/binary_mask_partial_{samplename}_Belly_Fat_Trimmed", "Belly Trimmed Visceral Fat", "orange")
+        (f"./masks/binary_mask_partial_{samplename}_T", "Tail", "pink"),
+        (f"./masks/binary_mask_partial_{samplename}_NQC1", "Norwegian Quality Cut 1", "blue"),
+        (f"./masks/binary_mask_partial_{samplename}_NQC2", "Norwegian Quality Cut 2", "green"),
+        (f"./masks/binary_mask_partial_{samplename}_H", "Head", "purple"),
+        (f"./masks/binary_mask_partial_{samplename}_F2", "Belly Trimmed Visceral Fat", "orange")
     ]
 
     # Retrieve the wavelengths from the header metadata
