@@ -5,15 +5,17 @@ from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 from sklearn.linear_model import LinearRegression
+from scipy import stats
 
 # Load the data
-file_path = 'dataEdited.csv'
+file_path = 'exported_data.csv'
 data = pd.read_csv(file_path)
 data = data[data['Fish ID'].isin(["S01", "S02", "S03", "S04", "S05", "S06"])]
 
 # Define the sample name to split off for the test set
-sample_name = 'S06'
-position = "NQC1"
+sample_name = 'S05'
+# Define the target name for the modelling
+target = f"Lipid_%"
 
 # Split off the test set where Fish ID is equal to the sample name
 test_set = data[data['Fish ID'] == sample_name]
@@ -22,17 +24,37 @@ test_set = data[data['Fish ID'] == sample_name]
 train_val_set = data[data['Fish ID'] != sample_name]
 
 # Extract the hyperspectral data (from 5th column onward) and target variable (C20:5n3)
-X = train_val_set.iloc[:, 44:].values  # Hyperspectral data for training and validation
-y = train_val_set['C20:5n3'].values  # Target variable for training and validation
+X = train_val_set.iloc[:, 45:].values  # Hyperspectral data for training and validation
+y = train_val_set[target].values  # Target variable for training and validation
 
-X_test = test_set.iloc[:, 44:].values  # Hyperspectral data for test set
-y_test = test_set['C20:5n3'].values  # Target variable for test set
+X_test = test_set.iloc[:, 45:].values  # Hyperspectral data for test set
+y_test = test_set[target].values  # Target variable for test set
+
+# z-Score outlier removal
+z_scores = stats.zscore(X)
+# Create a DataFrame for the Z-scores
+z_scores_df = pd.DataFrame(z_scores, columns=train_val_set.columns[45:])
+# Calculate the average Z-score for each row
+z_scores_df['average_score'] = z_scores_df.mean(axis=1)
+
+# Filter out rows with average Z-score greater than +-0.2
+mask = (z_scores_df['average_score'] <= 0.2) & (z_scores_df['average_score'] >= -0.2)
+X = X[mask]
+y = y[mask]
+
+# Plot the distribution of average Z-scores in 0.1 intervals
+plt.figure(figsize=(10, 6))
+plt.hist(z_scores_df['average_score'], bins=np.arange(min(z_scores_df['average_score']), max(z_scores_df['average_score']) + 0.1, 0.1), color='skyblue', edgecolor='black')
+plt.xlabel('Average Z-score')
+plt.ylabel('Frequency')
+plt.title('Distribution of Average Z-scores in 0.1 Intervals')
+plt.show()
 
 # Train-test split (90% train, 10% validation)
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, random_state=42)
 
 # Implementing PLS Regression with Cross-Validation
-pls_model = PLSRegression(n_components=10)  # Adjust n_components based on your data
+pls_model = PLSRegression(n_components=20)  # Adjust n_components based on your data
 
 # Perform cross-validation for PLS
 kf = KFold(n_splits=5, shuffle=True, random_state=44)
@@ -98,8 +120,8 @@ plt.figure(figsize=(8, 6))
 plt.scatter(y_test, y_pred_pls, alpha=0.7, color='blue', label="Original Predictions")
 plt.scatter(y_test, y_pred_corrected, alpha=0.7, color='green', label="Corrected Predictions")
 plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', lw=2, label="Ideal Fit")
-plt.xlabel("True Values (C20:5n3)")
-plt.ylabel("Predicted Values (C20:5n3)")
+plt.xlabel(f"True Values ({target})")
+plt.ylabel(f"Predicted Values ({target})")
 plt.title("Predicted vs True Values (Test Set) - PLS (with Slope and Bias Correction)")
 plt.legend()
 plt.show()
@@ -115,7 +137,7 @@ plt.title("Residuals Plot (Test Set) - PLS (Corrected)")
 plt.show()
 
 # Assuming the 5th column onward are the hyperspectral data columns (wavelengths), extract those column names as wavelengths
-wavelengths = train_val_set.columns[44:]  # Adjust this if necessary to match your data structure
+wavelengths = train_val_set.columns[45:]  # Adjust this if necessary to match your data structure
 
 # Get the coefficients from the PLS model
 pls_coefficients = pls_model.coef_.ravel()
