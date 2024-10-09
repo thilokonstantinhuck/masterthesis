@@ -19,7 +19,7 @@ def exportDataFrame():
     final_df = pd.concat(dfList, ignore_index=True)
 
     # Export the final DataFrame to a CSV file
-    final_df.to_csv(f'./data/exported_data.csv', index=False)
+    final_df.to_csv(f'./data/median_exported_data.csv', index=False)
 
     print("Data exported successfully to exported_data.csv")
 
@@ -34,13 +34,17 @@ def createDataFrameAutomatic(samplename):
     file_path = './data/data_GC.csv'
     gc_data = pd.read_csv(file_path)
 
+    # create new dataframe that has medians of the data
+    grouped_df = gc_data.groupby(['Fish ID', 'Position']).median(numeric_only=True).reset_index()
+    gc_data = grouped_df[grouped_df['Fish ID'] == samplename]
+    print(grouped_df)
+
     # Retrieve the wavelengths from the header metadata
     wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
 
     # mask path and lists
     maskPath = f"./masks/binary_mask_partial"
     positions = ["H","T","F2","NQC1","NQC2"]
-    replicates = ["R1","R2","R3"]
 
     rows = []
 
@@ -76,12 +80,9 @@ def createDataFrameAutomatic(samplename):
             # Calculate the average spectrum
             average_spectrum = accumulated_spectra / pixel_count
 
-
-            # Append the new row to the existing DataFrame
-            for replicate in replicates:
-                idString = f"{samplename}_{pos}_{replicate}"
-                data = [f"{fineMask}"] + gc_data[gc_data["Identifier"] == idString].iloc[0].tolist() + average_spectrum.tolist()
-                rows.append(data)
+            idString = f"{samplename}_{pos}"
+            data = [f"{fineMask}"] + gc_data[gc_data["Position"] == pos].iloc[0].tolist() + average_spectrum.tolist()
+            rows.append(data)
 
 
     # Convert the wavelengths array to a list
