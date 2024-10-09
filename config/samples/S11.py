@@ -8,10 +8,11 @@ backgroundArea = [(500, 100), (1600, 350)]
 
 # Define the positions by specifying two points (top-left and bottom-right) with names
 areasOfInterest = [
-    ((200, 150), (300, 300), 'Tail'),                       # T: Tail
-    ((750, 300), (850, 380), 'Norwegian_Quality_Cut1'),     # N1: Norwegian Quality Cut 1
-    ((750, 120), (850, 200), 'Norwegian_Quality_Cut2'),     # N2: Norwegian Quality Cut 2
-    ((1500, 300), (1600, 380), 'Head'),                     # H: Head
-    ((1500, 0), (1600, 80), 'Belly_Fat_Trimmed')            # F2: Belly with trimmed visceral fat
+    ((170, 180), 'T'),                       # T: Tail
+    ((550, 255), 'NQC1'),     # N1: Norwegian Quality Cut 1
+    ((550, 70), 'NQC2'),     # N2: Norwegian Quality Cut 2
+    ((1600, 255), 'H'),                     # H: Head
+    ((1550, 0), 'F2')            # F2: Belly with trimmed visceral fat
 ]
+
 
