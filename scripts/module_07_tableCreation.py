@@ -19,9 +19,9 @@ def exportDataFrame():
     final_df = pd.concat(dfList, ignore_index=True)
 
     # Export the final DataFrame to a CSV file
-    final_df.to_csv(f'./data/median_exported_data.csv', index=False)
+    final_df.to_csv(f'./data/average_exported_data.csv', index=False)
 
-    print("Data exported successfully to exported_data.csv")
+    print("Data exported successfully to average_exported_data.csv")
 
 
 def createDataFrameAutomatic(samplename):
@@ -35,7 +35,7 @@ def createDataFrameAutomatic(samplename):
     gc_data = pd.read_csv(file_path)
 
     # create new dataframe that has medians of the data
-    grouped_df = gc_data.groupby(['Fish ID', 'Position']).median(numeric_only=True).reset_index()
+    grouped_df = gc_data.groupby(['Fish ID', 'Position']).mean(numeric_only=True).reset_index()
     gc_data = grouped_df[grouped_df['Fish ID'] == samplename]
     print(grouped_df)
 
