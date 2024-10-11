@@ -9,7 +9,10 @@ from config.samples.S06 import samplename
 # List of sample names
 # samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
 # samples = ["S01"]
-samples = ["S01","S02", "S03", "S04", "S05", "S06"]
+# samples = ["S01","S02", "S03", "S04", "S05", "S06"]
+# samples = ["S07", "S08", "S09", "S10", "S11", "S12"]
+samples = ["S13", "S14", "S15", "S16", "S17", "S18"]
+
 
 
 
@@ -32,7 +35,7 @@ for sample in samples:
     # # 1 create hdrs
     # from scripts.module_02_emscProcessing import oneShotHDRcreation
     # oneShotHDRcreation(imageFilePath, config.samplename)
-
+    #
     # # 2 create lowlight mask
     # from scripts.module_04_masking import lowlightMaskCreation
     # lowlightMaskCreation(config.samplename)
@@ -50,8 +53,8 @@ for sample in samples:
     # # 5 plot average spectra
     # from scripts.module_06_visualization import fineAveragePlotAreas
     # fineAveragePlotAreas(config.samplename)
-#
-# create dataframe
+
+# # create dataframe
 from scripts.module_07_tableCreation import exportDataFrame
 exportDataFrame()
 
