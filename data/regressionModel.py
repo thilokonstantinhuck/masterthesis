@@ -2,13 +2,13 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
-from sklearn.linear_model import Ridge
+from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 from sklearn.preprocessing import StandardScaler
 from scipy import stats
 
 # Load the data
-file_path = 'median_exported_data_all.csv'
+file_path = 'exported_data_all.csv'
 data = pd.read_csv(file_path)
 # data = data[data['Fish ID'].isin(["S01", "S02", "S03", "S04", "S05", "S06"])]
 
@@ -17,11 +17,11 @@ sample_name = 'S05'
 # Define the target name for the modelling
 target = "Lipid_%"
 # Define where the first wavlength is located
-firstWL = 41
+firstWL = 45
 print(data.columns[firstWL])
 
 # Standardize the hyperspectral data
-scaler = StandardScaler()
+# scaler = StandardScaler()
 
 # Fit the scaler on the training/validation data and transform
 #data.iloc[:, 45:] = scaler.fit_transform(data.iloc[:, 45:].values)
@@ -52,41 +52,41 @@ for fish_id in train_val_set['Fish ID'].unique():
         mask[worst_indices] = False
         filtered_indices.extend(site_data[mask].index)
 
-train_val_set_filtered = train_val_set.loc[filtered_indices]
-X = train_val_set_filtered.iloc[:, firstWL:].values
-y = train_val_set_filtered[target].values
+# train_val_set_filtered = train_val_set.loc[filtered_indices]
+# X = train_val_set_filtered.iloc[:, firstWL:].values
+# y = train_val_set_filtered[target].values
 
 # Train-test split (90% train, 10% validation)
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, random_state=42)
 
-# Implementing Ridge Regression with Cross-Validation
-ridge_model = Ridge(alpha=10)  # Adjust alpha as needed
+# Implementing PLS Regression with Cross-Validation
+pls_model = PLSRegression(n_components=10)  # Adjust n_components as needed
 
-# Perform cross-validation for Ridge using R2 scoring
+# Perform cross-validation for PLS using R2 scoring
 kf = KFold(n_splits=5, shuffle=True, random_state=44)
-cv_scores_ridge = cross_val_score(ridge_model, X_train, y_train, cv=kf, scoring='r2')
-mean_cv_r2_ridge = np.mean(cv_scores_ridge)
-std_cv_r2_ridge = np.std(cv_scores_ridge)
+cv_scores_pls = cross_val_score(pls_model, X_train, y_train, cv=kf, scoring='r2')
+mean_cv_r2_pls = np.mean(cv_scores_pls)
+std_cv_r2_pls = np.std(cv_scores_pls)
 
-print(f"Mean CV R^2 (Ridge): {mean_cv_r2_ridge}, Std CV R^2 (Ridge): {std_cv_r2_ridge}")
+print(f"Mean CV R^2 (PLS): {mean_cv_r2_pls}, Std CV R^2 (PLS): {std_cv_r2_pls}")
 
-# Train the Ridge model on the training set
-ridge_model.fit(X_train, y_train)
+# Train the PLS model on the training set
+pls_model.fit(X_train, y_train)
 
-# Make predictions on the validation set using Ridge
-y_pred_val = ridge_model.predict(X_val)
+# Make predictions on the validation set using PLS
+y_pred_val = pls_model.predict(X_val)
 
-# Evaluate the performance on the validation set for Ridge
-mse_val_ridge = mean_squared_error(y_val, y_pred_val)
-r2_val_ridge = r2_score(y_val, y_pred_val)
-mae_val_ridge = mean_absolute_error(y_val, y_pred_val)
+# Evaluate the performance on the validation set for PLS
+mse_val_pls = mean_squared_error(y_val, y_pred_val)
+r2_val_pls = r2_score(y_val, y_pred_val)
+mae_val_pls = mean_absolute_error(y_val, y_pred_val)
 
-print(f"Validation MSE (Ridge): {mse_val_ridge}")
-print(f"Validation R^2 (Ridge): {r2_val_ridge}")
-print(f"Validation MAE (Ridge): {mae_val_ridge}")
+print(f"Validation MSE (PLS): {mse_val_pls}")
+print(f"Validation R^2 (PLS): {r2_val_pls}")
+print(f"Validation MAE (PLS): {mae_val_pls}")
 
-# Retrain the Ridge model on the train/val set
-ridge_model.fit(X, y)
+# Retrain the PLS model on the train/val set
+pls_model.fit(X, y)
 
 # Split up test set into the different positions
 positions = [
@@ -97,41 +97,41 @@ positions = [
     ["F2", "orange"]
 ]
 
-# Make predictions on the test set using Ridge
-y_pred_ridge = ridge_model.predict(X_test)
+# Make predictions on the test set using PLS
+y_pred_pls = pls_model.predict(X_test)
 
 # Residuals Plot
-residuals_ridge = y_test - y_pred_ridge
+residuals_pls = y_test - y_pred_pls.flatten()
 plt.figure(figsize=(8, 6))
-plt.scatter(y_pred_ridge, residuals_ridge, alpha=0.7, color='orange')
+plt.scatter(y_pred_pls, residuals_pls, alpha=0.7, color='orange')
 plt.axhline(0, color='red', linestyle='--')
 plt.xlabel("Predicted Values")
 plt.ylabel("Residuals")
-plt.title("Residuals Plot (Test Set) - Ridge Regression")
+plt.title("Residuals Plot (Test Set) - PLS Regression")
 plt.show()
 
-# Plotting the results for Ridge with different Positions
+# Plotting the results for PLS with different Positions
 plt.figure(figsize=(8, 6))
 for position_code, color in positions:
     mask = test_set['Position'].str.contains(position_code)
-    plt.scatter(y_test[mask], y_pred_ridge[mask], alpha=0.7, color=color, label=position_code)
+    plt.scatter(y_test[mask], y_pred_pls[mask], alpha=0.7, color=color, label=position_code)
 
 plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', lw=2, label="Ideal Fit")
 plt.xlabel(f"True Values ({target})")
 plt.ylabel(f"Predicted Values ({target})")
-plt.title("Predicted vs True Values (Test Set) - Ridge Regression by Position")
+plt.title("Predicted vs True Values (Test Set) - PLS Regression by Position")
 plt.legend()
 plt.show()
 
 # Calculate and print R^2 score for the entire test set
-r2_test = r2_score(y_test, y_pred_ridge)
+r2_test = r2_score(y_test, y_pred_pls)
 print(f"R^2 for the entire test set: {r2_test}")
 
 # Assuming the 45th column onward are the hyperspectral data columns (wavelengths), extract those column names as wavelengths
 wavelengths = train_val_set.columns[firstWL:]  # Adjust this if necessary to match your data structure
 
 # Plot regression coefficients
-coefficients = ridge_model.coef_
+coefficients = pls_model.coef_.flatten()
 plt.figure(figsize=(10, 6))
 plt.plot(wavelengths, coefficients, marker='o', linestyle='-', color='b')
 plt.axvline(x=32, color='r', linestyle='--')
@@ -141,7 +141,7 @@ plt.axvline(x=125, color='r', linestyle='--')
 plt.axvline(x=140, color='r', linestyle='--')
 plt.xlabel("Wavelength")
 plt.ylabel("Coefficient Value")
-plt.title("Ridge Regression Coefficients")
+plt.title("PLS Regression Coefficients")
 plt.xticks(ticks=np.arange(0, len(wavelengths), step=15), labels=np.round(wavelengths[::15].astype(float)), rotation=45)
 plt.tight_layout()
 plt.show()
