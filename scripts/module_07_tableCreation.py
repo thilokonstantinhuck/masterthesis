@@ -31,7 +31,7 @@ def createDataFrameAutomatic(samplename):
     image = img.load()
 
     # Load the CSV file
-    file_path = './data/data_GC.csv'
+    file_path = './data/data_GC_EPA_DHA.csv'
     gc_data = pd.read_csv(file_path)
 
     # # create new dataframe that has medians of the data

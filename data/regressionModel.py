@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
@@ -10,21 +11,14 @@ from scipy import stats
 # Load the data
 file_path = 'exported_data_all.csv'
 data = pd.read_csv(file_path)
-# data = data[data['Fish ID'].isin(["S01", "S02", "S03", "S04", "S05", "S06"])]
 
 # Define the sample name to split off for the test set
-sample_name = 'S05'
+sample_name = 'S02'
 # Define the target name for the modelling
 target = "Lipid_%"
 # Define where the first wavlength is located
-firstWL = 45
+firstWL = 46
 print(data.columns[firstWL])
-
-# Standardize the hyperspectral data
-# scaler = StandardScaler()
-
-# Fit the scaler on the training/validation data and transform
-#data.iloc[:, 45:] = scaler.fit_transform(data.iloc[:, 45:].values)
 
 # Split off the test set where Fish ID is equal to the sample name
 test_set = data[data['Fish ID'] == sample_name]
@@ -38,23 +32,6 @@ y = train_val_set[target].values  # Target variable for training and validation
 
 X_test = test_set.iloc[:, firstWL:].values  # Hyperspectral data for test set
 y_test = test_set[target].values  # Target variable for test set
-
-# z-Score outlier removal per fish and sampling site
-filtered_indices = []
-for fish_id in train_val_set['Fish ID'].unique():
-    fish_data = train_val_set[train_val_set['Fish ID'] == fish_id]
-    for site in fish_data['Position'].unique():
-        site_data = fish_data[fish_data['Position'] == site]
-        X_site = site_data.iloc[:, firstWL:].values
-        z_scores_site = np.abs(stats.zscore(X_site))
-        worst_indices = np.argsort(np.max(z_scores_site, axis=1))[-15:]
-        mask = np.ones(len(site_data), dtype=bool)
-        mask[worst_indices] = False
-        filtered_indices.extend(site_data[mask].index)
-
-# train_val_set_filtered = train_val_set.loc[filtered_indices]
-# X = train_val_set_filtered.iloc[:, firstWL:].values
-# y = train_val_set_filtered[target].values
 
 # Train-test split (90% train, 10% validation)
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, random_state=42)
@@ -88,6 +65,18 @@ print(f"Validation MAE (PLS): {mae_val_pls}")
 # Retrain the PLS model on the train/val set
 pls_model.fit(X, y)
 
+# Save the trained PLS model
+model_filename = 'pls_model.pkl'
+with open(model_filename, 'wb') as file:
+    pickle.dump(pls_model, file)
+
+# Make predictions on the test set using PLS
+y_pred_pls = pls_model.predict(X_test).flatten()
+
+# Slope and bias correction
+slope, intercept, r_value, p_value, std_err = stats.linregress(y_test, y_pred_pls)
+y_pred_corrected = (y_pred_pls - intercept) / slope
+
 # Split up test set into the different positions
 positions = [
     ["T", "pink"],
@@ -97,51 +86,54 @@ positions = [
     ["F2", "orange"]
 ]
 
-# Make predictions on the test set using PLS
-y_pred_pls = pls_model.predict(X_test)
-
-# Residuals Plot
-residuals_pls = y_test - y_pred_pls.flatten()
+# Residuals Plot (Before Correction)
+residuals_pls = y_test - y_pred_pls
 plt.figure(figsize=(8, 6))
 plt.scatter(y_pred_pls, residuals_pls, alpha=0.7, color='orange')
 plt.axhline(0, color='red', linestyle='--')
 plt.xlabel("Predicted Values")
 plt.ylabel("Residuals")
-plt.title("Residuals Plot (Test Set) - PLS Regression")
+plt.title("Residuals Plot (Test Set) - PLS Regression (Before Correction)")
+plt.show()
+
+# Residuals Plot (After Correction)
+residuals_corrected = y_test - y_pred_corrected
+plt.figure(figsize=(8, 6))
+plt.scatter(y_pred_corrected, residuals_corrected, alpha=0.7, color='green')
+plt.axhline(0, color='red', linestyle='--')
+plt.xlabel("Corrected Predicted Values")
+plt.ylabel("Residuals")
+plt.title("Residuals Plot (Test Set) - PLS Regression (After Correction)")
 plt.show()
 
 # Plotting the results for PLS with different Positions
 plt.figure(figsize=(8, 6))
 for position_code, color in positions:
     mask = test_set['Position'].str.contains(position_code)
-    plt.scatter(y_test[mask], y_pred_pls[mask], alpha=0.7, color=color, label=position_code)
+    plt.scatter(y_test[mask], y_pred_corrected[mask], alpha=0.7, color=color, label=position_code)
 
 plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', lw=2, label="Ideal Fit")
 plt.xlabel(f"True Values ({target})")
-plt.ylabel(f"Predicted Values ({target})")
-plt.title("Predicted vs True Values (Test Set) - PLS Regression by Position")
+plt.ylabel(f"Corrected Predicted Values ({target})")
+plt.title("Predicted vs True Values (Test Set) - PLS Regression by Position (After Correction)")
 plt.legend()
 plt.show()
 
 # Calculate and print R^2 score for the entire test set
-r2_test = r2_score(y_test, y_pred_pls)
-print(f"R^2 for the entire test set: {r2_test}")
+r2_test_corrected = r2_score(y_test, y_pred_corrected)
+print(f"R^2 for the entire test set (After Correction): {r2_test_corrected}")
 
-# Assuming the 45th column onward are the hyperspectral data columns (wavelengths), extract those column names as wavelengths
-wavelengths = train_val_set.columns[firstWL:]  # Adjust this if necessary to match your data structure
+# extract column names as wavelengths
+wavelengths = train_val_set.columns[firstWL:].astype(float)  # Adjust this if necessary to match your data structure
 
 # Plot regression coefficients
 coefficients = pls_model.coef_.flatten()
 plt.figure(figsize=(10, 6))
 plt.plot(wavelengths, coefficients, marker='o', linestyle='-', color='b')
-plt.axvline(x=32, color='r', linestyle='--')
-plt.axvline(x=47, color='r', linestyle='--')
-plt.axvline(x=70, color='r', linestyle='--')
-plt.axvline(x=125, color='r', linestyle='--')
-plt.axvline(x=140, color='r', linestyle='--')
+plt.fill_between(wavelengths, 0, coefficients, where=(coefficients >= 0), color='skyblue', alpha=0.5)
+plt.fill_between(wavelengths, 0, coefficients, where=(coefficients < 0), color='lightcoral', alpha=0.5)
 plt.xlabel("Wavelength")
 plt.ylabel("Coefficient Value")
 plt.title("PLS Regression Coefficients")
-plt.xticks(ticks=np.arange(0, len(wavelengths), step=15), labels=np.round(wavelengths[::15].astype(float)), rotation=45)
 plt.tight_layout()
 plt.show()
