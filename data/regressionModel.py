@@ -13,13 +13,13 @@ file_path = 'exported_data_all.csv'
 data = pd.read_csv(file_path)
 
 #select one feed group
-samples = ["S01", "S02", "S03", "S04", "S05", "S06"]
+# samples = ["S01", "S02", "S03", "S04", "S05", "S06"]
 # samples = ["S07", "S08", "S09", "S10", "S11", "S12"]
 # samples = ["S13", "S14", "S15", "S16", "S17", "S18"]
-data = data[data['Fish ID'].isin(samples)]
+# data = data[data['Fish ID'].isin(samples)]
 
 # select number of components
-n_components=3
+n_components=15
 # Define the sample name to split off for the test set
 sample_name = 'S01'
 # Define the target name for the modelling
@@ -35,7 +35,7 @@ test_set = data[data['Fish ID'] == sample_name]
 # The remaining data will be used for training and validation
 train_val_set = data[data['Fish ID'] != sample_name]
 
-# Extract the hyperspectral data (from 5th column onward) and target variable (C20:5n3)
+# Extract the hyperspectral data
 X = train_val_set.iloc[:, firstWL:].values  # Hyperspectral data for training and validation
 y = train_val_set[target].values  # Target variable for training and validation
 
