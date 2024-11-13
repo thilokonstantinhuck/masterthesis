@@ -1,29 +1,52 @@
 import spectral.io.envi as envi
 import pickle
 import importlib
-import matplotlib.pyplot as plt
 import numpy as np
 from numpy.ma.extras import average
 import pandas as pd
 from sklearn.metrics import r2_score
 from sklearn.linear_model import LinearRegression
 
+# Settings
+evaluationColumn = "EPAandDHA"
+# evaluationColumn = "Lipid_%"
+
 # Load the data
 file_path = 'data/average_data.csv'
 dataGC = pd.read_csv(file_path)
-evaluationColumn = "Lipid_%"
 
 # Load the trained PLS model
-model_filename = 'data/pls_model.pkl'
+model_filename = ('data/pls_model.pkl')
 with open(model_filename, 'rb') as file:
     pls_model = pickle.load(file)
 
-# positions to do validation on
-# samples = ["S01", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12"] # r2 0.61
-samples = ["S01", "S02", "S03", "S04", "S05", "S06"] # average R2 0.68 / median R2 0.63
-# samples = ["S07", "S08", "S09", "S10", "S11", "S12"] # r2 0.63 / median R2 0.63
-# samples = ["S13", "S14", "S15", "S16", "S17", "S18"] # r2 0.12
-# samplesTest = ["S02"]
+# Fat Concentration
+# F1
+# NC: 2 Result: 0.65 / NC: 3 Result:0.65 / NC: 4 Result: 0.65 / NC: 5 Result: 0.66 / NC: 6 Result: 0.67/ NC: 8 Result: 0.72 / NC: 10 Result: 0.69 / NC: 12 Result: 0.48
+# samples = ["S01", "S02", "S03", "S04", "S05", "S06"]
+# F2
+# NC: 2 Result: 0.57 / NC: 3 Result:0.61 / NC: 4 Result: 0.63 / NC: 5 Result: 0.67 / NC: 6 Result: 0.67/ NC: 8 Result: 0.68 / NC: 9 Result: 0.63 / NC: 10 Result: 0.38 / NC: 12 Result: 0.24
+# samples = ["S07", "S08", "S09", "S10", "S11", "S12"]
+# F3
+# NC: 2 Result: 0.46 / NC: 3 Result: 0.50 / NC: 4 Result: 0.60 / NC: 5 Result: 0.57 / NC: 6 Result: 0.49/ NC: 7 Result: 0.22
+# samples = ["S13", "S14", "S15", "S16", "S17", "S18"]
+# All Feeds
+# NC: 1 Result: 0.43 / NC: 2 Result: 0.51 / NC: 3 Result: 0.53 / NC: 4 Result: 0.55 / NC: 5 Result: 0.56 / NC: 6 Result: 0.58 / NC: 7 Result: 0.59/ NC: 8 Result: 0.57 / NC: 9 Result: 0.50 / NC: 10 Result: 0.36
+# samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
+
+# EPA and DHA Concentration
+# F1
+# NC: 1 Result: 0.43 / NC: 2 Result: 0.71 / NC: 3 Result: 0.72 / NC: 4 Result: 0.75 / NC: 5 Result: 0.77 / NC: 6 Result: 0.84 / NC: 7 Result: 0.85 / NC: 8 Result: 0.86 / NC: 10 Result: 0.87 / NC: 12 Result: 0.75/ NC: 15 Result: 0.64
+# samples = ["S01", "S02", "S03", "S04", "S05", "S06"]
+# F2
+# NC: 4 Result: 0.48 / NC: 6 Result: 0.58 / NC: 8 Result: 0.62 / NC: 10 Result: 0.61 / NC: 12 Result: 0.62 / NC: 15 Result: 0.49
+# samples = ["S07", "S08", "S09", "S10", "S11", "S12"]
+# F3
+# NC: 3 Result: 0.52 / NC: 4 Result: 0.57 / NC: 5 Result: 0.57 / NC: 6 Result: 0.63 / NC: 7 Result: 0.60 / NC: 8 Result: 0.56 / NC: 10 Result: 0.36 /
+samples = ["S13", "S14", "S15", "S16", "S17", "S18"]
+# All Feeds
+# NC: 3 Result: 0.41 / NC: 4 Result: 0.49 / NC: 5 Result: 0.54 / NC: 6 Result: 0.53 / NC: 7 Result: 0.52 / NC: 10 Result: 0.28 /
+# samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
 
 predicted = []
 actual = []

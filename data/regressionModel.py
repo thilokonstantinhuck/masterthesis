@@ -12,10 +12,19 @@ from scipy import stats
 file_path = 'exported_data_all.csv'
 data = pd.read_csv(file_path)
 
+#select one feed group
+samples = ["S01", "S02", "S03", "S04", "S05", "S06"]
+# samples = ["S07", "S08", "S09", "S10", "S11", "S12"]
+# samples = ["S13", "S14", "S15", "S16", "S17", "S18"]
+data = data[data['Fish ID'].isin(samples)]
+
+# select number of components
+n_components=3
 # Define the sample name to split off for the test set
-sample_name = 'S02'
+sample_name = 'S01'
 # Define the target name for the modelling
-target = "Lipid_%"
+target = "EPAandDHA"
+# target = "Lipid_%"
 # Define where the first wavlength is located
 firstWL = 46
 print(data.columns[firstWL])
@@ -36,8 +45,8 @@ y_test = test_set[target].values  # Target variable for test set
 # Train-test split (90% train, 10% validation)
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, random_state=42)
 
-# Implementing PLS Regression with Cross-Validation
-pls_model = PLSRegression(n_components=10)  # Adjust n_components as needed
+# Model with specific number of components selected
+pls_model = PLSRegression(n_components=n_components)  # Adjust n_components as needed
 
 # Perform cross-validation for PLS using R2 scoring
 kf = KFold(n_splits=5, shuffle=True, random_state=44)
@@ -66,6 +75,7 @@ print(f"Validation MAE (PLS): {mae_val_pls}")
 pls_model.fit(X, y)
 
 # Save the trained PLS model
+# model_filename = 'pls_model_EPADHA.pkl'
 model_filename = 'pls_model.pkl'
 with open(model_filename, 'wb') as file:
     pickle.dump(pls_model, file)
@@ -134,6 +144,6 @@ plt.fill_between(wavelengths, 0, coefficients, where=(coefficients >= 0), color=
 plt.fill_between(wavelengths, 0, coefficients, where=(coefficients < 0), color='lightcoral', alpha=0.5)
 plt.xlabel("Wavelength")
 plt.ylabel("Coefficient Value")
-plt.title("PLS Regression Coefficients")
+plt.title(f"PLS Regression Coefficients{n_components}")
 plt.tight_layout()
 plt.show()
