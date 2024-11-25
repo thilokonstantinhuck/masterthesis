@@ -30,7 +30,7 @@ dataGC = pd.read_csv(file_pathGC)
 # model
 file_path = 'exported_data_all.csv'
 data = pd.read_csv(file_path)
-data = data[data['Fish ID'].isin(trainSet)]
+#data = data[data['Fish ID'].isin(trainSet)]
 
 
 # Extract the hyperspectral data

@@ -12,9 +12,9 @@ from sklearn.metrics import r2_score
 # target = "EPAandDHA"
 target = "Lipid_%"
 
-selectedArea = "T"
+selectedArea = "NQC1"
 
-compFirst = 13
+compFirst = 14
 compLast = 15
 
 # Define where the first wavlength is located
@@ -23,8 +23,8 @@ firstWL = 46
 # samples = ["S01", "S02", "S03", "S04", "S05", "S06"]
 # samples = ["S07", "S08", "S09", "S10", "S11", "S12"]
 # samples = ["S13", "S14", "S15", "S16", "S17", "S18"]
-trainSet = ["S01", "S02", "S03", "S04", "S05", "S06", "S13", "S14", "S15", "S16", "S17", "S18"]
-testSet = ["S07", "S08", "S09", "S10", "S11", "S12"]
+samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
+
 
 ### Load the data
 # GC averaged
@@ -33,9 +33,8 @@ dataGC = pd.read_csv(file_pathGC)
 # model
 file_path = 'exported_data_all.csv'
 data = pd.read_csv(file_path)
-data = data[data['Fish ID'].isin(trainSet)]
 
-data = data[(data["Position"] == selectedArea)]
+data = data[(data["Position"] != selectedArea)]
 
 # Extract the hyperspectral data
 X = data.iloc[:, firstWL:].values  # Hyperspectral data for training and validation
@@ -56,7 +55,7 @@ for i in range(compFirst, compLast + 1):
 
     # find slope and bias from all modelling samples
 
-    for sample in testSet:
+    for sample in samples:
         print(sample)
         # Load the image
         hdr = f"../tempImages/processed_image_{sample}_absorbance_EMSC.hdr"
