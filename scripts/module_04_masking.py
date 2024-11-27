@@ -192,17 +192,17 @@ def rectangleAnalysis(samplename, rectangles, backgroundArea):
     # Display the plot
     plt.show()
 
-def cutMaskCreation(samplename, centerPoints):
+def cutMaskCreation(samplename, centerPoints, subSquareSize):
     # Load the binary mask
     binary_mask = imread(f"./masks/binary_mask_{samplename}_combined.png")
-
+    sizeSquare = (subSquareSize*5)-1
     # Create and save individual masks for each rectangle
     for top_left, name in centerPoints:
         # Create a mask of the same dimensions as the original binary mask
         mask = np.zeros_like(binary_mask)
 
         # Fill in the rectangle area with the original mask's values
-        mask[top_left[0]:top_left[0]+124, top_left[1]:top_left[1]+124] = binary_mask[top_left[0]:top_left[0]+124, top_left[1]:top_left[1]+124]
+        mask[top_left[0]:top_left[0]+sizeSquare, top_left[1]:top_left[1]+sizeSquare] = binary_mask[top_left[0]:top_left[0]+sizeSquare, top_left[1]:top_left[1]+sizeSquare]
 
         # Convert the mask to uint8 (assuming mask is binary)
         mask = (mask * 255).astype(np.uint8)

@@ -6,8 +6,8 @@ from config.generalParameters import emscWavelength2, emscWL2min, emscWL2max
 from config.generalParameters import emscWavelength3, emscWL3min, emscWL3max
 
 # List of sample names
-# samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
-samples = ["S18"]
+samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
+# samples = ["S18"]
 # samples = ["S01","S02", "S03", "S04", "S05", "S06"]
 # samples = ["S07", "S08", "S09", "S10", "S11", "S12"]
 # samples = ["S13", "S14", "S15", "S16", "S17", "S18"]
@@ -32,31 +32,31 @@ for sample in samples:
 
     imageFilePath = os.path.join(imageFolder[dataSetChoice], config.filename[dataSetChoice])
 
-    # 1 create hdrs
-    from scripts.module_02_emscProcessing import oneShotHDRcreation
-    oneShotHDRcreation(imageFilePath, config.samplename)
-
-    # 2 create lowlight mask
-    from scripts.module_04_masking import lowlightMaskCreation
-    lowlightMaskCreation(config.samplename)
-
-    # 3 combine masks
-    from scripts.module_04_masking import combineMasksNoEMSC
-    combineMasksNoEMSC(config.samplename)
+    # # 1 create hdrs
+    # from scripts.module_02_emscProcessing import oneShotHDRcreation
+    # oneShotHDRcreation(imageFilePath, config.samplename)
+    #
+    # # 2 create lowlight mask
+    # from scripts.module_04_masking import lowlightMaskCreation
+    # lowlightMaskCreation(config.samplename)
+    #
+    # # 3 combine masks
+    # from scripts.module_04_masking import combineMasksNoEMSC
+    # combineMasksNoEMSC(config.samplename)
 
     # # 4 adjust and create finemasks
     from scripts.module_04_masking import fineMasking, emscPicture, fineCutMaskCreation, cutMaskCreation
-    emscPicture(config.samplename,emscWavelength1,emscWL1min,emscWL1max)
-    fineMasking(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice])
-    fineCutMaskCreation(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice])
+    # emscPicture(config.samplename,emscWavelength1,emscWL1min,emscWL1max)
+    # fineMasking(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice])
+    # fineCutMaskCreation(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice])
     # OR
-    # cutMaskCreation(config.samplename, config.areasOfInterest)
+    cutMaskCreation(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice])
 
     # 5 plot average spectra
-    from scripts.module_06_visualization import fineAveragePlotAreas
-    fineAveragePlotAreas(config.samplename)
+    # from scripts.module_06_visualization import fineAveragePlotAreas
+    # fineAveragePlotAreas(config.samplename)
 
 # create dataframe
-# from scripts.module_07_tableCreation import exportDataFrame
-# exportDataFrame()
+from scripts.module_07_tableCreation import exportDataFrame
+exportDataFrame(dataSetChoice)
 

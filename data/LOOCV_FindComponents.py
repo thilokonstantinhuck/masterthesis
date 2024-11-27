@@ -7,8 +7,8 @@ from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import r2_score
 
 ### Settings
-# target = "C18:1n9t"
-target = "EPAandDHA"
+target = "C18:1n9c"
+# target = "EPAandDHA"
 # target = "Lipid_%"
 # Components range to graph and calculate
 compFirst = 1
@@ -16,11 +16,12 @@ compLast = 25
 # Define where the first wavlength is located
 firstWL = 46
 # List of sample names
+datasetChoice = 3
 samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
 
 ### Load the data
 # median coarse
-file_path = 'exported_data_coarse_median.csv'
+file_path = f'exported_data_coarse_median_dataset{datasetChoice}.csv'
 data = pd.read_csv(file_path)
 
 r2_score_list_Test = []
@@ -75,7 +76,7 @@ plt.plot(range(compFirst, compLast + 1), r2_score_list_Test, marker='o', linesty
 plt.plot(range(compFirst, compLast + 1), r2_score_list_Train, marker='o', linestyle='-', color='r', label="Train")
 plt.xlabel('Number of Components')
 plt.ylabel('R² Score')
-plt.title(f'R² Score vs Number of Components in PLS Model for {target} using LOOCV')
+plt.title(f'R² Score vs Components in PLS Model for {target} in Dataset {datasetChoice} using LOOCV')
 plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on the x-axis
 plt.grid(True)
 plt.ylim(0,1)

@@ -6,7 +6,7 @@ from matplotlib.image import imread
 import math
 import pandas as pd
 
-def exportDataFrame():
+def exportDataFrame(dataSetChoice):
     # List of sample names
     samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
 
@@ -19,7 +19,7 @@ def exportDataFrame():
     final_df = pd.concat(dfList, ignore_index=True)
 
     # Export the final DataFrame to a CSV file
-    final_df.to_csv(f'./data/exported_data_coarse_median.csv', index=False)
+    final_df.to_csv(f'./data/exported_data_coarse_median_dataset{dataSetChoice}.csv', index=False)
 
     print("Data exported successfully")
 
