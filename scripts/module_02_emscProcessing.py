@@ -60,7 +60,7 @@ def emscAbsorbanceHDRcreation(samplename):
 
     print(f"EMSC absorbance image {samplename} saved successfully.")
 
-def oneShotHDRcreation(imageFilePath, samplename):
+def oneShotHDRcreation(imageFilePath, samplename, dataSetName):
     # Load the image
     img = envi.open(imageFilePath)
     image = img.load()
@@ -71,9 +71,9 @@ def oneShotHDRcreation(imageFilePath, samplename):
 
     # Convert the mask to an image and save as PNG
     mask_image = Image.fromarray(mask)
-    mask_image.save(f"./masks/binary_mask_{samplename}_overlit.png")
+    mask_image.save(f"./masks/{dataSetName}_binary_mask_{samplename}_overlit.png")
 
-    print(f"Overlit mask {samplename} saved successfully.")
+    print(f"Overlit mask {dataSetName}_{samplename} saved successfully.")
 
     # Initialize an array to hold the processed spectra
     processed_image = np.copy(image)  # Start with a copy of the original image
@@ -107,8 +107,8 @@ def oneShotHDRcreation(imageFilePath, samplename):
     correctedSpectra = emscTransformer.transform(processed_absorbance_image)
 
     # Save the processed image in ENVI format
-    output_hdr = f".\\tempImages\\processed_image_{samplename}_absorbance_EMSC.hdr"
+    output_hdr = f".\\tempImages\\{dataSetName}_processed_image_{samplename}_absorbance_EMSC.hdr"
     envi.save_image(output_hdr, correctedSpectra, dtype=np.float32, interleave=img.metadata['interleave'],
                     metadata=img.metadata, force=True)
 
-    print(f"EMSC absorbance Oneshot image {samplename} saved successfully.")
+    print(f"EMSC absorbance Oneshot image {dataSetName}_{samplename} saved successfully.")

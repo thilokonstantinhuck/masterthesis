@@ -4,17 +4,15 @@ import matplotlib.pyplot as plt
 from matplotlib.image import imread
 import math
 
-from scipy.stats import alpha
 
-
-def areaPlotSpectra(samplename, area):
+def areaPlotSpectra(samplename, area, dataSetName):
     # Load the image
-    hdr = (f"./tempImages/processed_image_{samplename}_absorbance_EMSC.hdr")
+    hdr = (f"./tempImages/{dataSetName}_processed_image_{samplename}_absorbance_EMSC.hdr")
     img = envi.open(hdr)
     image = img.load()
 
     # Load the binary mask
-    binary_mask = imread(f"./masks/binary_mask_{samplename}_combined.png")
+    binary_mask = imread(f"./masks/{dataSetName}_binary_mask_{samplename}_combined.png")
 
     # Retrieve the wavelengths from the header metadata
     wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
@@ -41,10 +39,10 @@ def areaPlotSpectra(samplename, area):
                 count += 1  # Increment the counter
 
     # Label the plot
-    plt.title(f'Spectra of every 100 Pixels in {samplename}')
+    plt.title(f'Spectra of every 100 Pixels of Dataset {dataSetName} and Sample {samplename}')
     plt.xlabel('Wavelength [nm]')
     plt.ylabel('Absorbance')
-    plt.ylim(top=5, bottom=-0.5)
+    plt.ylim(top=3, bottom=-0.1)
     plt.show()
 
 
@@ -116,20 +114,20 @@ def averagePlotAreas(samplename):
     plt.savefig(f"./plots/plot_{samplename}_all_regions_averages.png", dpi=1000)
     plt.show()
 
-def fineAveragePlotAreas(samplename):
+def fineAveragePlotAreas(samplename, dataSetName):
     # Load the image
-    hdr = f"./tempImages/processed_image_{samplename}_absorbance_EMSC.hdr"
+    hdr = f"./tempImages/{dataSetName}_processed_image_{samplename}_absorbance_EMSC.hdr"
     img = envi.open(hdr)
     image = img.load()
     nSubSquares = 5
 
     # Define the masks and their corresponding labels
     masks = [
-        (f"./masks/binary_mask_partial_{samplename}_T", "Tail", "pink"),
-        (f"./masks/binary_mask_partial_{samplename}_NQC1", "Norwegian Quality Cut 1", "blue"),
-        (f"./masks/binary_mask_partial_{samplename}_NQC2", "Norwegian Quality Cut 2", "green"),
-        (f"./masks/binary_mask_partial_{samplename}_H", "Head", "purple"),
-        (f"./masks/binary_mask_partial_{samplename}_F2", "Belly Trimmed Visceral Fat", "orange")
+        (f"./masks/{dataSetName}_binary_mask_partial_{samplename}_T", "Tail", "pink"),
+        (f"./masks/{dataSetName}_binary_mask_partial_{samplename}_NQC1", "Norwegian Quality Cut 1", "blue"),
+        (f"./masks/{dataSetName}_binary_mask_partial_{samplename}_NQC2", "Norwegian Quality Cut 2", "green"),
+        (f"./masks/{dataSetName}_binary_mask_partial_{samplename}_H", "Head", "purple"),
+        (f"./masks/{dataSetName}_binary_mask_partial_{samplename}_F2", "Belly Trimmed Visceral Fat", "orange")
     ]
 
     # Retrieve the wavelengths from the header metadata
@@ -165,7 +163,7 @@ def fineAveragePlotAreas(samplename):
                             pixel_count += 1
 
             # print discarded and pixels
-            print(f"({mask_label})({fineMask} / {(nSubSquares**2)-1} )Number of valid/discarded pixels: {pixel_count} / {discarded_count}")
+            print(f"({dataSetName}_{mask_label})({fineMask} / {(nSubSquares**2)-1} )Number of valid/discarded pixels: {pixel_count} / {discarded_count}")
 
             # Calculate the average spectrum
             average_spectrum = accumulated_spectra / pixel_count
@@ -176,7 +174,7 @@ def fineAveragePlotAreas(samplename):
     # Adding labels, title, grid, and legend
     plt.xlabel('Wavelength (nm)')
     plt.ylabel('Absorbance')
-    plt.title(f'Average Spectra for Different Regions Sample {samplename}')
+    plt.title(f'Average Spectra for Different Regions Sample {dataSetName}_{samplename}')
     plt.grid(True)
     plt.ylim(0, 2.8)  # Set the upper y-limit manually
 
@@ -190,5 +188,5 @@ def fineAveragePlotAreas(samplename):
     plt.legend(unique_labels.values(), unique_labels.keys(), loc='lower right')
 
     # Save the plot with high resolution
-    plt.savefig(f"./plots/plot_{samplename}_all_regions_averages.png", dpi=1000)
+    plt.savefig(f"./plots/{dataSetName}_plot_{samplename}_all_regions_averages.png", dpi=1000)
     plt.show()

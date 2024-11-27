@@ -123,10 +123,10 @@ def combineMasks(samplename):
 
     print(f"Final combined mask {samplename} created and saved successfully.")
 
-def combineMasksNoEMSC(samplename):
+def combineMasksNoEMSC(samplename, dataSetName):
     # Load the binary masks
-    binary_mask_overlit = imread(f"./masks/binary_mask_{samplename}_overlit.png")
-    binary_mask_lowlight = imread(f"./masks/binary_mask_{samplename}_lowlight.png")
+    binary_mask_overlit = imread(f"./masks/{dataSetName}_binary_mask_{samplename}_overlit.png")
+    binary_mask_lowlight = imread(f"./masks/{dataSetName}_binary_mask_{samplename}_lowlight.png")
 
     # Combine the masks
     combined_mask = binary_mask_overlit * binary_mask_lowlight
@@ -139,14 +139,14 @@ def combineMasksNoEMSC(samplename):
     fig, axes = plt.subplots(1, 2, figsize=(10, 5))
 
     axes[0].imshow(mask2_display)
-    axes[0].set_title(f"Overlit Mask for {samplename}")
+    axes[0].set_title(f"Overlit Mask for {dataSetName}_{samplename}")
     axes[0].axis('off')
 
     axes[1].imshow(mask3_display)
-    axes[1].set_title(f"Lowlight Mask for {samplename}")
+    axes[1].set_title(f"Lowlight Mask for {dataSetName}_{samplename}")
     axes[1].axis('off')
 
-    plt.savefig(f"./plots/plot_{samplename}_mask_combination_analysis.png", dpi=1000)
+    plt.savefig(f"./plots/{dataSetName}_plot_{samplename}_mask_combination_analysis.png", dpi=1000)
     plt.show()
 
     # Convert the combined mask to uint8 format for saving
@@ -154,9 +154,9 @@ def combineMasksNoEMSC(samplename):
 
     # Save the final combined mask as a grayscale image using PIL
     combined_mask_image = Image.fromarray(combined_mask_uint8, mode='L')
-    combined_mask_image.save(f"./masks/binary_mask_{samplename}_combined.png")
+    combined_mask_image.save(f"./masks/{dataSetName}_binary_mask_{samplename}_combined.png")
 
-    print(f"Final combined mask {samplename} created and saved successfully.")
+    print(f"Final combined mask {dataSetName}_{samplename} created and saved successfully.")
 
 def rectangleAnalysis(samplename, rectangles, backgroundArea):
 
@@ -192,9 +192,9 @@ def rectangleAnalysis(samplename, rectangles, backgroundArea):
     # Display the plot
     plt.show()
 
-def cutMaskCreation(samplename, centerPoints, subSquareSize):
+def cutMaskCreation(samplename, centerPoints, subSquareSize, dataSetName):
     # Load the binary mask
-    binary_mask = imread(f"./masks/binary_mask_{samplename}_combined.png")
+    binary_mask = imread(f"./masks/{dataSetName}_binary_mask_{samplename}_combined.png")
     sizeSquare = (subSquareSize*5)-1
     # Create and save individual masks for each rectangle
     for top_left, name in centerPoints:
@@ -209,14 +209,14 @@ def cutMaskCreation(samplename, centerPoints, subSquareSize):
 
         # Convert the mask to an image and save as PNG
         mask_image = Image.fromarray(mask)
-        mask_image.save(f"./masks/binary_mask_partial_{samplename}_{name}.png")
+        mask_image.save(f"./masks/{dataSetName}_binary_mask_partial_{samplename}_{name}.png")
 
-        print(f"Mask for {samplename} {name} saved")
+        print(f"Mask for {dataSetName}_{samplename} {name} saved")
 
 
-def lowlightMaskCreation(samplename):
+def lowlightMaskCreation(samplename, dataSetName):
     # Load the hyperspectral image with absorption data
-    hdr = f"./tempImages/processed_image_{samplename}_absorbance_EMSC.hdr"
+    hdr = f"./tempImages/{dataSetName}_processed_image_{samplename}_absorbance_EMSC.hdr"
     img = envi.open(hdr)
     image = img.load()
 
@@ -239,22 +239,22 @@ def lowlightMaskCreation(samplename):
     # Display the lowlight mask
     plt.figure(figsize=(6, 6))
     plt.imshow(lowlight_mask, cmap='gray')
-    plt.title(f'Lowlight Mask {samplename} (Wavelength {lowlightWavelength}nm)')
+    plt.title(f'Lowlight Mask {dataSetName}_{samplename} (Wavelength {lowlightWavelength}nm)')
     plt.axis('off')
 
     # Save the plot as an image file
-    plt.savefig(f"./plots/plot_{samplename}_lowlight_mask.png", dpi=1000)
+    plt.savefig(f"./plots/{dataSetName}_plot_{samplename}_lowlight_mask.png", dpi=1000)
     plt.show()
 
     # Convert the mask to an image and save as PNG
     mask_image = Image.fromarray(lowlight_mask, mode='L')
-    mask_image.save(f"./masks/binary_mask_{samplename}_lowlight.png")
+    mask_image.save(f"./masks/{dataSetName}_binary_mask_{samplename}_lowlight.png")
 
-    print(f"Lowlight mask for {samplename} saved successfully.")
+    print(f"Lowlight mask for {dataSetName}_{samplename} saved successfully.")
 
-def fineMasking(samplename, centerPoints, subsquare_size):
+def fineMasking(samplename, centerPoints, subsquare_size, dataSetName):
     # Load the binary mask
-    binary_mask = imread(f"./plots/plot_{samplename}_emsc.png")
+    binary_mask = imread(f"./plots/{dataSetName}_plot_{samplename}_emsc.png")
 
     # Create a figure and axis to plot the image
     fig, ax = plt.subplots(figsize=(10, 20))  # Adjust the figure size to match the aspect ratio
@@ -275,18 +275,18 @@ def fineMasking(samplename, centerPoints, subsquare_size):
                 ax.add_patch(rect)
 
     # Customize the plot as needed
-    ax.set_title(f'Binary Mask {samplename} with Rectangles')
+    ax.set_title(f'Binary Mask {dataSetName}_{samplename} with Rectangles')
     ax.axis('on')  # Show the axes
 
     # Save the plot as an image file
-    fig.savefig(f"./plots/plot_{samplename}_combined_mask.png", dpi=300, bbox_inches='tight')
+    fig.savefig(f"./plots/{dataSetName}_plot_{samplename}_combined_mask.png", dpi=300, bbox_inches='tight')
 
     # Display the plot
     plt.show()
 
-def emscPicture(samplename, emscWavelength, wlMin, wlMax):
+def emscPicture(samplename, emscWavelength, wlMin, wlMax, dataSetName):
     # Load the hyperspectral image with absorption data
-    hdr = f"./tempImages/processed_image_{samplename}_absorbance_EMSC.hdr"
+    hdr = f"./tempImages/{dataSetName}_processed_image_{samplename}_absorbance_EMSC.hdr"
     img = envi.open(hdr)
     image = img.load()
 
@@ -306,22 +306,22 @@ def emscPicture(samplename, emscWavelength, wlMin, wlMax):
     plt.figure(figsize=(4, 6))
     plt.imshow(index_image, cmap='gist_heat', vmin=0.4, vmax=0.7)
     plt.colorbar(label=f'Absorbance at {emscWavelength}nm')
-    plt.title(f'EMSC Image at {emscWavelength}nm for {samplename}')
+    plt.title(f'EMSC Image at {emscWavelength}nm for {dataSetName}_{samplename}')
     plt.xlabel('X Coordinate')
     plt.ylabel('Y Coordinate')
 
     # Save the figure
-    plt.savefig(f"./plots/plot_{samplename}_emsc_{emscWavelength}.png")
+    plt.savefig(f"./plots/{dataSetName}_plot_{samplename}_emsc_{emscWavelength}.png")
     plt.show()
 
     # Convert the normalized image to an 8-bit grayscale PNG for further use
     emsc_image = Image.fromarray((index_image * 255).astype(np.uint8))
-    emsc_image.save(f"./plots/plot_{samplename}_emsc.png")
-    print(f"EMSC Picture {samplename} {emscWavelength}nm saved successfully.")
+    emsc_image.save(f"./plots/{dataSetName}_plot_{samplename}_emsc.png")
+    print(f"EMSC Picture {dataSetName}_{samplename} {emscWavelength}nm saved successfully.")
 
-def fineCutMaskCreation(samplename, centerPoints, subsquare_size):
+def fineCutMaskCreation(samplename, centerPoints, subsquare_size, dataSetName):
     # Load the binary mask
-    binary_mask = imread(f"./masks/binary_mask_{samplename}_combined.png")
+    binary_mask = imread(f"./masks/{dataSetName}_binary_mask_{samplename}_combined.png")
 
     # Draw each rectangle
     numberOfSubsquares = 5
@@ -342,6 +342,6 @@ def fineCutMaskCreation(samplename, centerPoints, subsquare_size):
 
                 # Convert the mask to an image and save as PNG
                 mask_image = Image.fromarray(mask)
-                mask_image.save(f"./masks/binary_mask_partial_{samplename}_{name}_{squareID}.png")
+                mask_image.save(f"./masks/{dataSetName}_binary_mask_partial_{samplename}_{name}_{squareID}.png")
 
-                print(f"Mask for {samplename} {name} {squareID} saved")
+                print(f"Mask for {dataSetName}_{samplename} {name} {squareID} saved")
