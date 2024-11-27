@@ -1,4 +1,8 @@
-filename = "S12_SWIR_384_SN3151_9006us_2022-05-27T115725_raw_rad_float32.hdr"
+filename = [
+    "S12_SWIR_384_SN3151_9006us_2022-05-27T115725_raw_rad_float32.hdr",
+    "s12_l_g2_SWIR_384_SN3151_3500us_2024-11-26T101739_raw_rad_float32.hdr",
+    "s12_s_SWIR_384_SN3151_4800us_2024-11-26T105759_raw_rad_float32.hdr"
+]
 
 samplename = "S12"
 
@@ -7,11 +11,23 @@ samplename = "S12"
 backgroundArea = [(500, 100), (1600, 350)]
 
 # Define the positions by specifying two points (top-left and bottom-right) with names
-areasOfInterest = [
+areasOfInterest = [[
     ((50, 110), 'T'),                       # T: Tail
     ((500, 225), 'NQC1'),     # N1: Norwegian Quality Cut 1
     ((500, 10), 'NQC2'),     # N2: Norwegian Quality Cut 2
     ((1650, 255), 'H'),                     # H: Head
     ((1650, 10), 'F2')            # F2: Belly with trimmed visceral fat
+    ],[
+    ((300, 150), 'T'),                       # T: Tail
+    ((800, 250), 'NQC1'),     # N1: Norwegian Quality Cut 1
+    ((800, 80), 'NQC2'),     # N2: Norwegian Quality Cut 2
+    ((1850, 250), 'H'),                     # H: Head
+    ((1850, 0), 'F2')            # F2: Belly with trimmed visceral fat
+    ],[
+    ((300, 130), 'T'),                       # T: Tail
+    ((460, 80), 'NQC1'),     # N1: Norwegian Quality Cut 1
+    ((450, 200), 'NQC2'),     # N2: Norwegian Quality Cut 2
+    ((760, 90), 'H'),                     # H: Head
+    ((720, 240), 'F2')            # F2: Belly with trimmed visceral fat
+    ]
 ]
-

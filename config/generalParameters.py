@@ -1,6 +1,12 @@
 # Path to image data
 
-imageFolder = r"C:\SALMONDATA\SWIR_Hyspex\All_converted_file"
+imageFolder = [
+    r"C:\SALMONDATA\SWIR_Hyspex\All_converted_file",
+    r"C:\Users\thilohuc\OneDrive - Norwegian University of Life Sciences\Desktop\Salmon_Data_November_24_full\3_RAW_converted_ordered\second_dataset",
+    r"C:\Users\thilohuc\OneDrive - Norwegian University of Life Sciences\Desktop\Salmon_Data_November_24_full\3_RAW_converted_ordered\third_dataset"
+]
+
+subsquareSize = [25,10,10]
 
 # Settings Lighting Detection
 overlitDefinition = 0.75

@@ -158,11 +158,11 @@ def fineAveragePlotAreas(samplename):
                     # Check if the pixel is included in the binary mask
                     if binary_mask[row, column] == 1:
                         spectra = image[row, column, :].squeeze()
-                        if not any(math.isinf(x) for x in spectra):
+                        if any(math.isinf(x) for x in spectra):
+                            discarded_count += 1
+                        else:
                             accumulated_spectra += spectra
                             pixel_count += 1
-                        else:
-                            discarded_count += 1
 
             # print discarded and pixels
             print(f"({mask_label})({fineMask} / {(nSubSquares**2)-1} )Number of valid/discarded pixels: {pixel_count} / {discarded_count}")

@@ -252,7 +252,7 @@ def lowlightMaskCreation(samplename):
 
     print(f"Lowlight mask for {samplename} saved successfully.")
 
-def fineMasking(samplename, centerPoints):
+def fineMasking(samplename, centerPoints, subsquare_size):
     # Load the binary mask
     binary_mask = imread(f"./plots/plot_{samplename}_emsc.png")
 
@@ -263,7 +263,6 @@ def fineMasking(samplename, centerPoints):
     ax.imshow(binary_mask, cmap='gray')
 
     # Draw each rectangle
-    subsquare_size = 25  # Example predefined width and height
     numberOfSubsquares = 5
 
     for top_left, name in centerPoints:
@@ -320,12 +319,11 @@ def emscPicture(samplename, emscWavelength, wlMin, wlMax):
     emsc_image.save(f"./plots/plot_{samplename}_emsc.png")
     print(f"EMSC Picture {samplename} {emscWavelength}nm saved successfully.")
 
-def fineCutMaskCreation(samplename, centerPoints):
+def fineCutMaskCreation(samplename, centerPoints, subsquare_size):
     # Load the binary mask
     binary_mask = imread(f"./masks/binary_mask_{samplename}_combined.png")
 
     # Draw each rectangle
-    subsquare_size = 25  # Example predefined width and height
     numberOfSubsquares = 5
 
     for top_left, name in centerPoints:
