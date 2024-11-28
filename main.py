@@ -13,7 +13,7 @@ samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10",
 # samples = ["S13", "S14", "S15", "S16", "S17", "S18"]
 
 # set Dataset to use (0,1 or 2)
-dataSetChoice = 0
+dataSetChoice = 2
 
 
 def load_sample_config(sampleName):
@@ -32,24 +32,24 @@ for sample in samples:
 
     imageFilePath = os.path.join(imageFolder[dataSetChoice], config.filename[dataSetChoice])
 
-    # 1 create hdrs
-    from scripts.module_02_emscProcessing import oneShotHDRcreation
-    oneShotHDRcreation(imageFilePath, config.samplename, dataSetChoice+1)
-
-    # 2 create lowlight mask
-    from scripts.module_04_masking import lowlightMaskCreation
-    lowlightMaskCreation(config.samplename, dataSetChoice+1)
-
-    # 3 combine masks
-    from scripts.module_04_masking import combineMasksNoEMSC
-    combineMasksNoEMSC(config.samplename, dataSetChoice+1)
+    # # 1 create hdrs
+    # from scripts.module_02_emscProcessing import oneShotHDRcreation
+    # oneShotHDRcreation(imageFilePath, config.samplename, dataSetChoice+1)
+    #
+    # # 2 create lowlight mask
+    # from scripts.module_04_masking import lowlightMaskCreation
+    # lowlightMaskCreation(config.samplename, dataSetChoice+1)
+    #
+    # # 3 combine masks
+    # from scripts.module_04_masking import combineMasksNoEMSC
+    # combineMasksNoEMSC(config.samplename, dataSetChoice+1)
 
     # # 4 adjust and create finemasks
-    # from scripts.module_04_masking import fineMasking, emscPicture, fineCutMaskCreation, cutMaskCreation
+    from scripts.module_04_masking import fineMasking, emscPicture, fineCutMaskCreation, cutMaskCreation
     # emscPicture(config.samplename,emscWavelength1,emscWL1min,emscWL1max, dataSetChoice+1)
     # fineMasking(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice], dataSetChoice+1)
     # fineCutMaskCreation(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice], dataSetChoice+1)
-    # # OR
+    # OR
     # cutMaskCreation(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice], dataSetChoice+1)
     #
     # # 5 plot average spectra
@@ -58,6 +58,6 @@ for sample in samples:
     # fineAveragePlotAreas(config.samplename, dataSetChoice+1)
 
 # create dataframe
-# from scripts.module_07_tableCreation import exportDataFrame
-# exportDataFrame(dataSetChoice)
+from scripts.module_07_tableCreation import exportDataFrame
+exportDataFrame(dataSetChoice+1)
 

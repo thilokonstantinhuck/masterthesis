@@ -12,8 +12,8 @@ def exportDataFrame(dataSetChoice):
 
     dfList = []
 
-    for image in samples:
-        dfList.append(createDataFrameCoarse(image))
+    for sample in samples:
+        dfList.append(createDataFrameCoarse(sample, dataSetChoice))
 
     # Concatenate all DataFrames into one
     final_df = pd.concat(dfList, ignore_index=True)
@@ -23,9 +23,9 @@ def exportDataFrame(dataSetChoice):
 
     print("Data exported successfully")
 
-def createDataFrameCoarse(samplename):
+def createDataFrameCoarse(samplename, dataSetName):
     # Load the image
-    hdr = f"./tempImages/processed_image_{samplename}_absorbance_EMSC.hdr"
+    hdr = f"./tempImages/{dataSetName}_processed_image_{samplename}_absorbance_EMSC.hdr"
     img = envi.open(hdr)
     image = img.load()
 
@@ -37,7 +37,7 @@ def createDataFrameCoarse(samplename):
     wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
 
     # mask path and lists
-    maskPath = f"./masks/binary_mask_partial"
+    maskPath = f"./masks/{dataSetName}_binary_mask_partial"
     positions = ["H","T","F2","NQC1","NQC2"]
 
     rows = []
@@ -86,9 +86,9 @@ def createDataFrameCoarse(samplename):
     return df
 
 
-def createDataFrameFine(samplename):
+def createDataFrameFine(samplename, dataSetName):
     # Load the image
-    hdr = f"./tempImages/processed_image_{samplename}_absorbance_EMSC.hdr"
+    hdr = f"./tempImages/{dataSetName}_processed_image_{samplename}_absorbance_EMSC.hdr"
     img = envi.open(hdr)
     image = img.load()
 
@@ -105,7 +105,7 @@ def createDataFrameFine(samplename):
     wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
 
     # mask path and lists
-    maskPath = f"./masks/binary_mask_partial"
+    maskPath = f"./masks/{dataSetName}_binary_mask_partial"
     positions = ["H","T","F2","NQC1","NQC2"]
     replicates = ["R1","R2","R3"]
 

@@ -7,7 +7,7 @@ from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import r2_score
 
 ### Settings
-# target = "C18:1n9c"
+# target = "C20:1n9"
 # target = "EPAandDHA"
 target = "Lipid_%"
 # Components range to graph and calculate
