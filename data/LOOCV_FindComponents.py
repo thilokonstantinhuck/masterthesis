@@ -6,8 +6,8 @@ from sklearn.metrics import r2_score
 
 ### Settings
 # target = "C20:1n9"
-target = "EPAandDHA"
-# target = "Lipid_%"
+# target = "EPAandDHA"
+target = "Lipid_%"
 # Components range to graph and calculate
 compFirst = 1
 compLast = 25
@@ -119,7 +119,7 @@ for i in range(compFirst, compLast + 1):
     r2train = r2_score(actualTrain, predictedTrain)
     r2_score_list_train_fine.append(r2train)
 
-    print(f"R² SCORE coarse for {i} Components: {r2test}")
+    print(f"R² SCORE fine for {i} Components: {r2test}")
 
 # Plot the R² scores for each number of components
 plt.figure(figsize=(10, 6))
@@ -135,4 +135,5 @@ plt.grid(True)
 plt.ylim(0,1)
 plt.yticks(np.arange(0, 1.1, 0.1))
 plt.legend()
+plt.savefig(f"../plots/{datasetChoice}_plot_{target}_modelR2.png", dpi=1000)
 plt.show()
