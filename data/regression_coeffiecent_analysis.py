@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.cross_decomposition import PLSRegression
-from sklearn.metrics import r2_score
 
 ### Settings
 # target = "C20:1n9"
@@ -65,4 +64,31 @@ plt.grid(alpha=0.5)
 plt.tight_layout()
 
 # Show the plot
+plt.show()
+
+# Calculate the area under each curve
+area_coarse = np.trapezoid(coefficients_coarse, wavelengths)
+area_fine = np.trapezoid(coefficients_fine, wavelengths)
+print(f"Area under coarse model curve: {area_coarse}")
+print(f"Area under fine model curve: {area_fine}")
+
+# Scale each curve by the area of the other
+scaled_coarse = coefficients_coarse
+scaled_fine = coefficients_fine * (area_coarse/area_fine)
+
+# Plot the scaled regression coefficients for both models
+plt.figure(figsize=(10, 6))
+plt.plot(wavelengths, scaled_coarse, label='Coarse Model', color='blue', linewidth=2)
+plt.plot(wavelengths, scaled_fine, label='Scaled Fine Model', color='orange', linewidth=2)
+plt.axhline(0, color='gray', linestyle='--', linewidth=0.7)
+
+# Add labels and legend
+plt.xlabel('Wavelength (nm)', fontsize=12)
+plt.ylabel('Regression Coefficients', fontsize=12)
+plt.title(f'PLS Regression Coefficients for {target}', fontsize=14)
+plt.legend(fontsize=12)
+plt.grid(alpha=0.5)
+plt.tight_layout()
+
+# Show the scaled plot
 plt.show()
