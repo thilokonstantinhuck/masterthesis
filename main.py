@@ -7,13 +7,13 @@ from config.generalParameters import emscWavelength3, emscWL3min, emscWL3max
 
 # List of sample names
 samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
-# samples = ["S18"]
+# samples = ["S01"]
 # samples = ["S01","S02", "S03", "S04", "S05", "S06"]
 # samples = ["S07", "S08", "S09", "S10", "S11", "S12"]
 # samples = ["S13", "S14", "S15", "S16", "S17", "S18"]
 
 # set Dataset to use (0,1 or 2)
-dataSetChoice = 2
+dataSetChoice = 1
 
 
 def load_sample_config(sampleName):
@@ -47,9 +47,8 @@ for sample in samples:
     # # 4 adjust and create finemasks
     from scripts.module_04_masking import fineMasking, emscPicture, fineCutMaskCreation, cutMaskCreation
     # emscPicture(config.samplename,emscWavelength1,emscWL1min,emscWL1max, dataSetChoice+1)
-    # fineMasking(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice], dataSetChoice+1)
+    fineMasking(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice], dataSetChoice+1)
     # fineCutMaskCreation(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice], dataSetChoice+1)
-    # OR
     # cutMaskCreation(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice], dataSetChoice+1)
     #
     # # 5 plot average spectra
@@ -59,5 +58,5 @@ for sample in samples:
 
 # create dataframe
 from scripts.module_07_tableCreation import exportDataFrame
-exportDataFrame(dataSetChoice+1)
+# exportDataFrame(dataSetChoice+1)
 

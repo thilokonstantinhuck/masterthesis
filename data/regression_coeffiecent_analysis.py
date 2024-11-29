@@ -5,8 +5,8 @@ from sklearn.cross_decomposition import PLSRegression
 
 ### Settings
 # target = "C20:1n9"
-target = "EPAandDHA"
-# target = "Lipid_%"
+#target = "EPAandDHA"
+target = "Lipid_%"
 components = 5
 # List of sample names
 datasetChoice = 3
@@ -58,7 +58,7 @@ plt.axhline(0, color='gray', linestyle='--', linewidth=0.7)
 # Add labels and legend
 plt.xlabel('Wavelength (nm)', fontsize=12)
 plt.ylabel('Regression Coefficients', fontsize=12)
-plt.title('PLS Regression Coefficients Across Wavelengths', fontsize=14)
+plt.title(f'PLS Regression Coefficients for {target}', fontsize=14)
 plt.legend(fontsize=12)
 plt.grid(alpha=0.5)
 plt.tight_layout()
@@ -67,8 +67,8 @@ plt.tight_layout()
 plt.show()
 
 # Calculate the area under each curve
-area_coarse = np.trapezoid(coefficients_coarse, wavelengths)
-area_fine = np.trapezoid(coefficients_fine, wavelengths)
+area_coarse = np.trapezoid(np.abs(coefficients_coarse), wavelengths)
+area_fine = np.trapezoid(np.abs(coefficients_fine), wavelengths)
 print(f"Area under coarse model curve: {area_coarse}")
 print(f"Area under fine model curve: {area_fine}")
 
