@@ -16,18 +16,18 @@ areasOfInterest = [[
     ((800, 10), 'NQC1'),     # N1: Norwegian Quality Cut 1
     ((800, 255), 'NQC2'),     # N2: Norwegian Quality Cut 2
     ((0, 10), 'H'),                     # H: Head
-    ((0, 255), 'F2')            # F2: Belly with trimmed visceral fat
+    ((0, 255), 'F1')            # F1: Belly with trimmed visceral fat
     ],[
     ((720, 190), 'T'),                       # T: Tail
     ((510, 230), 'NQC1'),     # N1: Norwegian Quality Cut 1
     ((520, 90), 'NQC2'),     # N2: Norwegian Quality Cut 2
     ((220, 230), 'H'),                     # H: Head
-    ((230, 80), 'F2')            # F2: Belly with trimmed visceral fat
+    ((230, 80), 'F1')            # F1: Belly with trimmed visceral fat
     ],[
     ((300, 150), 'T'),                       # T: Tail
     ((460, 100), 'NQC1'),     # N1: Norwegian Quality Cut 1
     ((450, 220), 'NQC2'),     # N2: Norwegian Quality Cut 2
     ((760, 90), 'H'),                     # H: Head
-    ((760, 250), 'F2')            # F2: Belly with trimmed visceral fat
+    ((760, 250), 'F1')            # F1: Belly with trimmed visceral fat
     ]
 ]
