@@ -1,15 +1,15 @@
 import pandas as pd
 
 # Load the data
-file_path = 'data_GC_EPA_DHA.csv'
+file_path = 'GC_from_google.csv'
 data = pd.read_csv(file_path)
 
 # Drop the unnecessary columns
-data = data.drop(columns=['Identifier', 'Feed', 'Fish_Type', 'Replicates'])
+data = data.drop(columns=['Identifier', 'Fish_Type', 'Replicates'])
 
 # Assuming columns include 'Fish', 'Position', 'Technical replicate', and measurement columns
 # Drop the 'Technical replicate' column for aggregation
-columns_to_group = ['Fish ID', 'Position']
+columns_to_group = ['Fish_ID', 'Position']
 
 # Calculate the median and average for each position in each fish
 median_df = data.groupby(columns_to_group).median().reset_index()
