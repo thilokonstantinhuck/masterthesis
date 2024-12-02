@@ -13,7 +13,7 @@ samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10",
 # samples = ["S13", "S14", "S15", "S16", "S17", "S18"]
 
 # set Dataset to use (0,1 or 2)
-dataSetChoice = 0
+dataSetChoice = 2
 
 
 def load_sample_config(sampleName):

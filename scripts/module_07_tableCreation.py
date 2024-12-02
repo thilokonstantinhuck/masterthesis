@@ -42,7 +42,7 @@ def createDataFrameCoarse(samplename, dataSetName):
 
     # mask path and lists
     maskPath = f"./masks/{dataSetName}_binary_mask_partial"
-    positions = ["H","T","F2","NQC1","NQC2"]
+    positions = ["H","T","F1","NQC1","NQC2"]
 
     rows = []
 
@@ -75,7 +75,7 @@ def createDataFrameCoarse(samplename, dataSetName):
 
 
         # Append the new row to the existing DataFrame
-        data = gc_data[(gc_data["Fish ID"] == samplename) & (gc_data["Position"] == pos)].iloc[0].tolist() + average_spectrum.tolist()
+        data = gc_data[(gc_data["Fish_ID"] == samplename) & (gc_data["Position"] == pos)].iloc[0].tolist() + average_spectrum.tolist()
         rows.append(data)
 
 
@@ -97,7 +97,7 @@ def createDataFrameFine(samplename, dataSetName):
     image = img.load()
 
     # Load the CSV file
-    file_path = './data/data_GC_EPA_DHA.csv'
+    file_path = './data/GC_from_google.csv'
     gc_data = pd.read_csv(file_path)
 
     # # create new dataframe that has medians of the data
@@ -110,7 +110,7 @@ def createDataFrameFine(samplename, dataSetName):
 
     # mask path and lists
     maskPath = f"./masks/{dataSetName}_binary_mask_partial"
-    positions = ["H","T","F2","NQC1","NQC2"]
+    positions = ["H","T","F1","NQC1","NQC2"]
     replicates = ["R1","R2","R3"]
 
     rows = []
