@@ -22,12 +22,12 @@ list_targets = ['Lipid_%',
                 'C20:0', 'C20:1n9', 'C20:2n6', 'C20:3n3', 'C20:3n6', #35
                 'C20:4n6', 'C20:5n3', 'C21:0', 'C22:0', 'C22:1n9', #40
                 'C22:2n6', 'C22:5n3', 'C22:6n3', 'C23:0', 'C24:0', 'C24:1n9'] #46
-target = list_targets[25] # 46 max
+target = list_targets[9] # 46 max
 # Components range to graph and calculate
 compFirst = 1
 compLast = 25
 # List of sample names
-datasetChoice = 3
+datasetChoice = 1
 samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
 
 ### Load the data
@@ -37,6 +37,8 @@ file_path = f'exported_data_coarse_median_dataset{datasetChoice}.csv'
 data_coarse = pd.read_csv(file_path)
 r2_score_list_test_coarse = []
 r2_score_list_train_coarse = []
+bias_list_test_coarse = []
+r2_score_list_test_coarse_bias_corrected = []
 # Define where the first wavlength is located
 first_wavelength_coarse = 49
 print(data_coarse.columns[first_wavelength_coarse])
@@ -46,11 +48,15 @@ file_path = f'exported_data_fine_dataset{datasetChoice}.csv'
 data_fine = pd.read_csv(file_path)
 r2_score_list_test_fine = []
 r2_score_list_train_fine = []
+bias_list_test_fine = []
+r2_score_list_test_fine_bias_corrected = []
 # Define where the first wavlength is located
 first_wavelength_fine = 53
 print(data_fine.columns[first_wavelength_fine])
 
+##Coarse
 for i in range(compFirst, compLast + 1):
+    print(f"{i}_coarse")
 
     # Model with specific number of components selected
     pls_model = PLSRegression(n_components=i)
@@ -78,22 +84,33 @@ for i in range(compFirst, compLast + 1):
 
         predictedTest.extend(y_pred_test.flatten())  # Append the predicted values
         actualTest.extend(test_y.flatten())  # Append the actual values
-
-    predictedTest = np.array(predictedTest)
-    actualTest = np.array(actualTest)
-
-    r2test = r2_score(actualTest, predictedTest)
-    r2_score_list_test_coarse.append(r2test)
-
+    ##train
     predictedTrain = np.array(predictedTrain)
     actualTrain = np.array(actualTrain)
 
+    # R2 Score Calculation
     r2train = r2_score(actualTrain, predictedTrain)
     r2_score_list_train_coarse.append(r2train)
 
-    print(f"R² SCORE coarse for {i} Components: {r2test}")
+    ##test
+    predictedTest = np.array(predictedTest)
+    actualTest = np.array(actualTest)
 
+    # R2 Score Calculation
+    r2test = r2_score(actualTest, predictedTest)
+    r2_score_list_test_coarse.append(r2test)
+
+    # Bias Calculation (Mean Error)
+    bias_test = np.mean(predictedTest - actualTest)
+    bias_list_test_coarse.append(bias_test)
+
+    # Bias corrected R2 Score Calculation
+    r2_bias_corrected = r2_score(actualTrain, predictedTrain-bias_test)
+    r2_score_list_test_coarse_bias_corrected.append(r2_bias_corrected)
+
+##Fine
 for i in range(compFirst, compLast + 1):
+    print(f"{i}_fine")
 
     # Model with specific number of components selected
     pls_model = PLSRegression(n_components=i)
@@ -122,33 +139,74 @@ for i in range(compFirst, compLast + 1):
         predictedTest.extend(y_pred_test.flatten())  # Append the predicted values
         actualTest.extend(test_y.flatten())  # Append the actual values
 
-    predictedTest = np.array(predictedTest)
-    actualTest = np.array(actualTest)
-
-    r2test = r2_score(actualTest, predictedTest)
-    r2_score_list_test_fine.append(r2test)
-
+    ##train
     predictedTrain = np.array(predictedTrain)
     actualTrain = np.array(actualTrain)
 
+    # R2 Score Calculation
     r2train = r2_score(actualTrain, predictedTrain)
     r2_score_list_train_fine.append(r2train)
 
-    print(f"R² SCORE fine for {i} Components: {r2test}")
+    ##test
+    predictedTest = np.array(predictedTest)
+    actualTest = np.array(actualTest)
 
-# Plot the R² scores for each number of components
-plt.figure(figsize=(10, 6))
-plt.plot(range(compFirst, compLast + 1), r2_score_list_test_coarse, marker='o', linestyle='-', color='b', label="Test Coarse")
-plt.plot(range(compFirst, compLast + 1), r2_score_list_train_coarse, marker='o', linestyle='-', color='r', label="Train Coarse")
-plt.plot(range(compFirst, compLast + 1), r2_score_list_test_fine, marker='x', linestyle='-', color='g', label="Test Fine")
-plt.plot(range(compFirst, compLast + 1), r2_score_list_train_fine, marker='x', linestyle='-', color='y', label="Train Fine")
+    # R2 Score Calculation
+    r2test = r2_score(actualTest, predictedTest)
+    r2_score_list_test_fine.append(r2test)
+
+    # Bias Calculation (Mean Error)
+    bias_test = np.mean(predictedTest) - np.mean(predictedTrain)
+    bias_list_test_fine.append(bias_test)
+
+    # Bias corrected R2 Score Calculation
+    r2_bias_corrected = r2_score(actualTrain, predictedTrain - bias_test)
+    r2_score_list_test_fine_bias_corrected.append(r2_bias_corrected)
+
+# Plot the R² scores and Bias for each number of components
+plt.figure(figsize=(12, 12))
+
+# R2 Scores
+plt.subplot(3, 1, 1)
+plt.plot(range(compFirst, compLast + 1), r2_score_list_train_coarse, marker='o', linestyle='-', label="Train Coarse", color="blue")
+plt.plot(range(compFirst, compLast + 1), r2_score_list_test_coarse, marker='o', linestyle='-', label="Test Coarse", color="red")
+plt.plot(range(compFirst, compLast + 1), r2_score_list_train_fine, marker='x', linestyle='-', label="Train Fine", color="skyblue")
+plt.plot(range(compFirst, compLast + 1), r2_score_list_test_fine, marker='x', linestyle='-', label="Test Fine", color="salmon")
 plt.xlabel('Number of Components')
 plt.ylabel('R² Score')
 plt.title(f'R² Score vs Components in PLS Model for {target} in Dataset {datasetChoice} using LOOCV')
 plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on the x-axis
 plt.grid(True)
-plt.ylim(0,1)
-plt.yticks(np.arange(0, 1.1, 0.1))
+plt.ylim(0, 1)
+plt.yticks(np.arange(0, 1, 0.1))
 plt.legend()
-plt.savefig(f"../plots/crossvalidation/plot_modelR2_{target}_{datasetChoice}.png", dpi=1000)
+
+# Bias
+plt.subplot(3, 1, 2)
+plt.plot(range(compFirst, compLast + 1), bias_list_test_coarse, marker='o', linestyle='-', label="Test Coarse", color="red")
+plt.plot(range(compFirst, compLast + 1), bias_list_test_fine, marker='x', linestyle='-', label="Test Fine", color="salmon")
+plt.xlabel('Number of Components')
+plt.ylabel('Bias (Mean Error)')
+plt.title(f'Bias vs Components in PLS Model for {target} in Dataset {datasetChoice} using LOOCV')
+plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on the x-axis
+plt.grid(True)
+plt.legend()
+
+# R2 Scores corrected
+plt.subplot(3, 1, 3)
+plt.plot(range(compFirst, compLast + 1), r2_score_list_train_coarse, marker='o', linestyle='-', label="Train Coarse", color="blue")
+plt.plot(range(compFirst, compLast + 1), r2_score_list_test_coarse_bias_corrected, marker='o', linestyle='-', label="Test Coarse", color="red")
+plt.plot(range(compFirst, compLast + 1), r2_score_list_train_fine, marker='x', linestyle='-', label="Train Fine", color="skyblue")
+plt.plot(range(compFirst, compLast + 1), r2_score_list_test_fine_bias_corrected, marker='x', linestyle='-', label="Test Fine", color="salmon")
+plt.xlabel('Number of Components')
+plt.ylabel('R² Score')
+plt.title(f'corrected R² Score vs Components in PLS Model for {target} in Dataset {datasetChoice} using LOOCV')
+plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on the x-axis
+plt.grid(True)
+plt.ylim(0, 1)
+plt.yticks(np.arange(0, 1, 0.1))
+plt.legend()
+
+plt.tight_layout()
+plt.savefig(f"../plots/crossvalidation/plot_modelR2_bias_{target}_{datasetChoice}.png", dpi=1000)
 plt.show()
