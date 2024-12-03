@@ -101,12 +101,13 @@ for i in range(compFirst, compLast + 1):
     r2_score_list_test_coarse.append(r2test)
 
     # Bias Calculation (Mean Error)
-    bias_test = np.mean(predictedTest - actualTest)
+    bias_test = np.mean(predictedTest) - np.mean(actualTrain)
     bias_list_test_coarse.append(bias_test)
 
     # Bias corrected R2 Score Calculation
-    r2_bias_corrected = r2_score(actualTrain, predictedTrain-bias_test)
+    r2_bias_corrected = r2_score(actualTest, predictedTest-bias_test)
     r2_score_list_test_coarse_bias_corrected.append(r2_bias_corrected)
+    print(f"{r2test} -> {r2_bias_corrected}")
 
 ##Fine
 for i in range(compFirst, compLast + 1):
@@ -156,12 +157,13 @@ for i in range(compFirst, compLast + 1):
     r2_score_list_test_fine.append(r2test)
 
     # Bias Calculation (Mean Error)
-    bias_test = np.mean(predictedTest) - np.mean(predictedTrain)
+    bias_test = np.mean(predictedTest) - np.mean(actualTrain)
     bias_list_test_fine.append(bias_test)
 
     # Bias corrected R2 Score Calculation
-    r2_bias_corrected = r2_score(actualTrain, predictedTrain - bias_test)
+    r2_bias_corrected = r2_score(actualTest, (predictedTest - bias_test))
     r2_score_list_test_fine_bias_corrected.append(r2_bias_corrected)
+    print(f"{r2test} -> {r2_bias_corrected}")
 
 # Plot the R² scores and Bias for each number of components
 plt.figure(figsize=(12, 12))
