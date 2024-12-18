@@ -104,9 +104,12 @@ list_targets = [
 
 targetChoice = 0
 target = list_targets[targetChoice]
-components = 1
+components = 10
 # List of sample names
 datasetChoice = 3
+testFeed = 3
+# positions = ["H","T","F1","NQC1","NQC2"]
+# position_selection = positions[3]
 #samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
 
 ### Load the data
@@ -114,6 +117,7 @@ datasetChoice = 3
 # median coarse
 file_path = f'exported_data_coarse_median_dataset{datasetChoice}.csv'
 data_coarse = pd.read_csv(file_path)
+#data_coarse = data_coarse[data_coarse["Position"] == position_selection]
 # Define where the first wavlength is located
 first_wavelength_coarse = gcLength
 print("953...=" + data_coarse.columns[first_wavelength_coarse])
@@ -121,6 +125,7 @@ print("953...=" + data_coarse.columns[first_wavelength_coarse])
 # all replicate fine
 file_path = f'exported_data_fine_dataset{datasetChoice}.csv'
 data_fine = pd.read_csv(file_path)
+#data_fine = data_fine[data_fine["Position"] == position_selection]
 # Define where the first wavlength is located
 first_wavelength_fine = first_wavelength_coarse+4
 print("953...=" + data_fine.columns[first_wavelength_fine])
@@ -162,6 +167,11 @@ axes[1].plot(wavelengths, coefficients_fine, label=f'Fine Model Comp.) all Feeds
 
 feedCounter = 1
 
+measured_calibration = []
+predicted_calibration = []
+measured_test = []
+predicted_test = []
+
 for feed in feedGroups:
     data_coarse_train = data_coarse[~data_coarse["Fish_ID"].isin(feed)]
     data_fine_train = data_fine[~data_fine["Fish_ID"].isin(feed)]
@@ -195,16 +205,43 @@ for feed in feedGroups:
     y_predicted_coarse = pls_model_coarse.predict(X_test)
     y_predicted_fine = pls_model_fine.predict(X_test)
     # r2 score uncorrected
-    r2_coarse = r2_score(y_test, y_predicted_coarse)
-    r2_fine = r2_score(y_test, y_predicted_fine)
-    # mean absolute error
-    mae_coarse = mean_absolute_error(y_test, y_predicted_coarse)
-    mae_fine = mean_absolute_error(y_test, y_predicted_fine)
+    r2_coarse_u = round(r2_score(y_test, y_predicted_coarse),2)
+    r2_fine_u = round(r2_score(y_test, y_predicted_fine),2)
+    # mean absolute error uncorrected
+    mae_coarse_u = round(mean_absolute_error(y_test, y_predicted_coarse),2)
+    mae_fine_u = round(mean_absolute_error(y_test, y_predicted_fine),2)
+    # calculate means
+    mean_measured_coarse = np.mean(y_test)
+    mean_measured_fine = np.mean(y_test)
+    mean_predicted_coarse = np.mean(y_predicted_coarse)
+    mean_predicted_fine = np.mean(y_predicted_fine)
+    # slope calculation
+    slope_coarse = np.sum((y_predicted_coarse - mean_predicted_coarse) * (y_test - mean_measured_coarse)) / np.sum((y_predicted_coarse - mean_predicted_coarse) ** 2)
+    slope_fine = np.sum((y_predicted_fine - mean_predicted_fine) * (y_test - mean_measured_fine)) / np.sum((y_predicted_fine - mean_predicted_fine) ** 2)
+    # bias calculation
+    bias_coarse = mean_measured_coarse - slope_coarse * mean_predicted_coarse
+    bias_fine = mean_measured_fine - slope_fine * mean_predicted_fine
+    #correction
+    y_predicted_coarse_c = y_predicted_coarse * slope_coarse + bias_coarse
+    y_predicted_fine_c = y_predicted_coarse * slope_fine + bias_fine
+    # r2 score corrected
+    r2_coarse_c = round(r2_score(y_test, y_predicted_coarse_c),2)
+    r2_fine_c = round(r2_score(y_test, y_predicted_fine_c),2)
+    # mean absolute error corrected
+    mae_coarse_c = round(mean_absolute_error(y_test, y_predicted_coarse_c),2)
+    mae_fine_c = round(mean_absolute_error(y_test, y_predicted_fine_c),2)
+
 
     # Plot on the first subplot (coarse)
-    axes[0].plot(wavelengths, coefficients_coarse, label=f'Coarse Model (R2: {r2_coarse}, MAE{mae_coarse}) without Feed {feedCounter}', linewidth=2, alpha=0.6)
+    axes[0].plot(wavelengths, coefficients_coarse, label=f'Coarse Model (R2: {r2_coarse_u}(C:{r2_coarse_c}), MAE{mae_coarse_u}(C:{mae_coarse_c})) without Feed {feedCounter}', linewidth=2, alpha=0.6)
     # Plot on the second subplot (fine)
-    axes[1].plot(wavelengths, coefficients_fine, label=f'Fine Model (R2: {r2_fine}, MAE{mae_fine}) without Feed {feedCounter}', linewidth=2, alpha=0.6)
+    axes[1].plot(wavelengths, coefficients_fine, label=f'Fine Model (R2: {r2_fine_u}(C:{r2_fine_c}), MAE{mae_fine_u}(C:{mae_fine_c})) without Feed {feedCounter}', linewidth=2, alpha=0.6)
+
+    if feedCounter == testFeed:
+        measured_calibration = y_fine
+        predicted_calibration = pls_model_fine.predict(X_fine)
+        measured_test = y_test
+        predicted_test = y_predicted_fine_c
 
     feedCounter += 1
 
@@ -230,30 +267,27 @@ plt.savefig(f"../plots/regression/plot_regression_coefficients_{target}_{dataset
 
 # Show the plots
 plt.show()
+set_max = 25
+set_min = 0
+# Plot
+plt.figure(figsize=(8, 6))
+# Calibration set
+plt.scatter(measured_calibration, predicted_calibration, color='grey', label='Calibration Set')
+# Test set
+plt.scatter(measured_test, predicted_test, color='blue', label='Test Set')
+# Add 1:1 line for reference
+plt.plot([set_min, set_max], [set_min, set_max], color='black', linestyle='--', label='1:1 Line')
 
-# # Calculate the area under each curve
-# area_coarse = np.trapezoid(np.abs(coefficients_coarse), wavelengths)
-# area_fine = np.trapezoid(np.abs(coefficients_fine), wavelengths)
-# print(f"Area under coarse model curve: {area_coarse}")
-# print(f"Area under fine model curve: {area_fine}")
-#
-# # Scale each curve by the area of the other
-# scaled_coarse = coefficients_coarse
-# scaled_fine = coefficients_fine * (area_coarse/area_fine)
-#
-# # Plot the scaled regression coefficients for both models
-# plt.figure(figsize=(10, 6))
-# plt.plot(wavelengths, scaled_coarse, label='Coarse Model', color='blue', linewidth=2)
-# plt.plot(wavelengths, scaled_fine, label='Scaled Fine Model', color='orange', linewidth=2)
-# plt.axhline(0, color='gray', linestyle='--', linewidth=0.7)
-#
-# # Add labels and legend
-# plt.xlabel('Wavelength (nm)', fontsize=12)
-# plt.ylabel('Regression Coefficients', fontsize=12)
-# plt.title(f'PLS Regression Coefficients for {target}', fontsize=14)
-# plt.legend(fontsize=12)
-# plt.grid(alpha=0.5)
-# plt.tight_layout()
-# plt.savefig(f"../plots/{datasetChoice}_plot_{target}_regression_coeffiecients.png", dpi=1000)
-# # Show the scaled plot
-# plt.show()
+# Labels and title
+plt.xlabel(f'Measured {target} Concentration')
+plt.ylabel(f'Predicted {target} Concentration')
+plt.title(f'{target} Concentrations / Components: {components} / Set {datasetChoice} / Indep. Feed: {testFeed}') #  / Pos. {position_selection}
+plt.legend()
+
+# Adjust plot limits (if necessary)
+plt.xlim(set_min, set_max)
+plt.ylim(set_min, set_max)
+
+# Show plot
+plt.grid(True)
+plt.show()
