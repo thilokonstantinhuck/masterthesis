@@ -1,3 +1,6 @@
+# GC data length coarse
+gcLength = 95
+
 # Path to image data
 
 imageFolder = [

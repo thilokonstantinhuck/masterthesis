@@ -4,6 +4,8 @@ import pandas as pd
 file_path = 'GC_from_google.csv'
 data = pd.read_csv(file_path)
 
+print(data.shape[1]-3)
+
 # Drop the unnecessary columns
 data = data.drop(columns=['Identifier', 'Fish_Type', 'Replicates'])
 
@@ -24,3 +26,4 @@ average_df.to_csv(average_output_path, index=False)
 
 print(f'Median data saved to: {median_output_path}')
 print(f'Average data saved to: {average_output_path}')
+
