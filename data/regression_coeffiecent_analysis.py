@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.cross_decomposition import PLSRegression
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_absolute_error
 
 ### Settings
 list_targets = [
@@ -102,9 +102,9 @@ list_targets = [
     'T_C24_1n9'
 ]
 
-targetChoice = 55
+targetChoice = 0
 target = list_targets[targetChoice]
-components = 10
+components = 1
 # List of sample names
 datasetChoice = 3
 #samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
@@ -197,11 +197,14 @@ for feed in feedGroups:
     # r2 score uncorrected
     r2_coarse = r2_score(y_test, y_predicted_coarse)
     r2_fine = r2_score(y_test, y_predicted_fine)
+    # mean absolute error
+    mae_coarse = mean_absolute_error(y_test, y_predicted_coarse)
+    mae_fine = mean_absolute_error(y_test, y_predicted_fine)
 
     # Plot on the first subplot (coarse)
-    axes[0].plot(wavelengths, coefficients_coarse, label=f'Coarse Model (R2: {r2_coarse}) without Feed {feedCounter}', linewidth=2, alpha=0.6)
+    axes[0].plot(wavelengths, coefficients_coarse, label=f'Coarse Model (R2: {r2_coarse}, MAE{mae_coarse}) without Feed {feedCounter}', linewidth=2, alpha=0.6)
     # Plot on the second subplot (fine)
-    axes[1].plot(wavelengths, coefficients_fine, label=f'Fine Model (R2: {r2_fine}) without Feed {feedCounter}', linewidth=2, alpha=0.6)
+    axes[1].plot(wavelengths, coefficients_fine, label=f'Fine Model (R2: {r2_fine}, MAE{mae_fine}) without Feed {feedCounter}', linewidth=2, alpha=0.6)
 
     feedCounter += 1
 
