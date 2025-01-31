@@ -5,19 +5,19 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, Flatten, Dense, Input
 
 ### Settings
-target = 'Lipid_%'
+target = 'T_EPAandDHA'
 datasetChoice = 3
 testFeed = 2
 
 ### Load the data
 # median coarse
-file_path = f'exported_data_coarse_median_dataset{datasetChoice}.csv'
+file_path = f'../exported_data_coarse_median_dataset{datasetChoice}.csv'
 data_coarse = pd.read_csv(file_path)
 # Define where the first wavlength is located
 first_wavelength_coarse = gcLength
 
 # all replicate fine
-file_path = f'exported_data_fine_dataset{datasetChoice}.csv'
+file_path = f'../exported_data_fine_dataset{datasetChoice}.csv'
 data_fine = pd.read_csv(file_path)
 # Define where the first wavlength is located
 first_wavelength_fine = first_wavelength_coarse+4
