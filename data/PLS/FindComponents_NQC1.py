@@ -102,22 +102,24 @@ list_targets = [
     'T_C24_1n9'
 ]
 
-targetChoice = 9
+targetChoice = 55
 target = list_targets[targetChoice]
 # Components range to graph and calculate
 compFirst = 1
 compLast = 25
 datasetChoice = 3
+positions = ["H","T","F1","NQC1","NQC2"]
+position_selection = positions[3]
 samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
 #samples = ["S01", "S02", "S03", "S04", "S05", "S06"]
 #samples = ["S07", "S08", "S09", "S10", "S11", "S12"]
 ### Load the data
 
 # median coarse
-file_path = f'exported_data_coarse_median_dataset{datasetChoice}.csv'
+file_path = f'../exported_data_coarse_median_dataset{datasetChoice}.csv'
 data_coarse = pd.read_csv(file_path)
 #data_coarse = data_coarse[data_coarse["Fish_ID"].isin(samples)]
-#data_coarse = data_coarse[data_coarse["Position"] == "H"]
+#data_coarse = data_coarse[data_coarse["Position"] == position_selection]
 mean = round(data_coarse[target].mean(), 3)
 std = round(data_coarse[target].std(), 3)
 r2_score_list_test_coarse = []
@@ -133,10 +135,10 @@ first_wavelength_coarse = gcLength
 print(data_coarse.columns[first_wavelength_coarse])
 
 # all replicate fine
-file_path = f'exported_data_fine_dataset{datasetChoice}.csv'
+file_path = f'../exported_data_fine_dataset{datasetChoice}.csv'
 data_fine = pd.read_csv(file_path)
 #data_fine = data_fine[data_fine["Fish_ID"].isin(samples)]
-#data_fine = data_fine[data_fine["Position"] == "H"]
+#data_fine = data_fine[data_fine["Position"] == position_selection]
 r2_score_list_test_fine = []
 r2_score_list_train_fine = []
 mae_list_test_fine = []
@@ -148,9 +150,6 @@ r2_score_list_test_fine_bias_corrected = []
 # Define where the first wavlength is located
 first_wavelength_fine = first_wavelength_coarse+4
 print(data_fine.columns[first_wavelength_fine])
-
-
-
 
 ##Coarse
 for i in range(compFirst, compLast + 1):
@@ -164,24 +163,24 @@ for i in range(compFirst, compLast + 1):
     actualTest = []
     actualTrain = []
 
-    for sample in samples:
-        train_X = data_coarse[data_coarse["Fish_ID"] != sample].iloc[:, first_wavelength_coarse:].values
-        test_X = data_coarse[data_coarse["Fish_ID"] == sample].iloc[:, first_wavelength_coarse:].values
-        train_y = data_coarse[data_coarse["Fish_ID"] != sample][target].values
-        test_y = data_coarse[data_coarse["Fish_ID"] == sample][target].values
+    train_X = data_coarse[(data_coarse["Position"] != position_selection)].iloc[:, first_wavelength_coarse:].values
+    test_X = data_coarse[(data_coarse["Position"] == position_selection)].iloc[:, first_wavelength_coarse:].values
+    train_y = data_coarse[(data_coarse["Position"] != position_selection)][target].values
+    test_y = data_coarse[(data_coarse["Position"] == position_selection)][target].values
 
-        # Train the PLS model on the train set
-        pls_model.fit(train_X, train_y)
+    # Train the PLS model on the train set
+    pls_model.fit(train_X, train_y)
 
-        # Predict on both
-        y_pred_train = pls_model.predict(train_X)
-        y_pred_test = pls_model.predict(test_X)
+    # Predict on both
+    y_pred_train = pls_model.predict(train_X)
+    y_pred_test = pls_model.predict(test_X)
 
-        predictedTrain.extend(y_pred_train.flatten())  # Append the predicted values
-        actualTrain.extend(train_y.flatten())  # Append the actual values
+    predictedTrain.extend(y_pred_train.flatten())  # Append the predicted values
+    actualTrain.extend(train_y.flatten())  # Append the actual values
 
-        predictedTest.extend(y_pred_test.flatten())  # Append the predicted values
-        actualTest.extend(test_y.flatten())  # Append the actual values
+    predictedTest.extend(y_pred_test.flatten())  # Append the predicted values
+    actualTest.extend(test_y.flatten())  # Append the actual values
+
     ##train
     predictedTrain = np.array(predictedTrain)
     actualTrain = np.array(actualTrain)
@@ -220,24 +219,23 @@ for i in range(compFirst, compLast + 1):
     actualTest = []
     actualTrain = []
 
-    for sample in samples:
-        train_X = data_fine[data_fine["Fish_ID"] != sample].iloc[:, first_wavelength_fine:].values
-        test_X = data_coarse[data_coarse["Fish_ID"] == sample].iloc[:, first_wavelength_coarse:].values
-        train_y = data_fine[data_fine["Fish_ID"] != sample][target].values
-        test_y = data_coarse[data_coarse["Fish_ID"] == sample][target].values
+    train_X = data_fine[(data_fine["Position"] != position_selection)].iloc[:, first_wavelength_fine:].values
+    test_X = data_coarse[(data_coarse["Position"] == position_selection)].iloc[:, first_wavelength_coarse:].values
+    train_y = data_fine[(data_fine["Position"] != position_selection)][target].values
+    test_y = data_coarse[(data_coarse["Position"] == position_selection)][target].values
 
-        # Train the PLS model on the train set
-        pls_model.fit(train_X, train_y)
+    # Train the PLS model on the train set
+    pls_model.fit(train_X, train_y)
 
-        # Predict on both
-        y_pred_train = pls_model.predict(train_X)
-        y_pred_test = pls_model.predict(test_X)
+    # Predict on both
+    y_pred_train = pls_model.predict(train_X)
+    y_pred_test = pls_model.predict(test_X)
 
-        predictedTrain.extend(y_pred_train.flatten())  # Append the predicted values
-        actualTrain.extend(train_y.flatten())  # Append the actual values
+    predictedTrain.extend(y_pred_train.flatten())  # Append the predicted values
+    actualTrain.extend(train_y.flatten())  # Append the actual values
 
-        predictedTest.extend(y_pred_test.flatten())  # Append the predicted values
-        actualTest.extend(test_y.flatten())  # Append the actual values
+    predictedTest.extend(y_pred_test.flatten())  # Append the predicted values
+    actualTest.extend(test_y.flatten())  # Append the actual values
 
     ##train
     predictedTrain = np.array(predictedTrain)
@@ -268,8 +266,22 @@ for i in range(compFirst, compLast + 1):
 # Plot the R² scores and Bias for each number of components
 plt.figure(figsize=(12, 12))
 
+# MAE
+plt.subplot(4, 1, 1)
+plt.plot(range(compFirst, compLast + 1), mae_list_train_coarse, marker='o', linestyle='-', label="Train Coarse", color="blue")
+plt.plot(range(compFirst, compLast + 1), mae_list_test_coarse, marker='o', linestyle='-', label="Test Coarse", color="red")
+plt.plot(range(compFirst, compLast + 1), mae_list_train_fine, marker='x', linestyle='-', label="Train Fine", color="skyblue")
+plt.plot(range(compFirst, compLast + 1), mae_list_test_fine, marker='x', linestyle='-', label="Test Fine", color="salmon")
+plt.xlabel('Number of Components')
+plt.ylabel('Mean Absolute Error')
+plt.title(f'MAE vs Components for {target} (mean:{mean} std:{std} in Dataset {datasetChoice} using LOOCV')
+plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on the x-axis
+plt.grid(True)
+plt.legend()
+
+
 # R2 Scores
-plt.subplot(3, 1, 1)
+plt.subplot(4, 1, 2)
 plt.plot(range(compFirst, compLast + 1), r2_score_list_train_coarse, marker='o', linestyle='-', label="Train Coarse", color="blue")
 plt.plot(range(compFirst, compLast + 1), r2_score_list_test_coarse, marker='o', linestyle='-', label="Test Coarse", color="red")
 plt.plot(range(compFirst, compLast + 1), r2_score_list_train_fine, marker='x', linestyle='-', label="Train Fine", color="skyblue")
@@ -283,8 +295,23 @@ plt.ylim(0, 1)
 plt.yticks(np.arange(0, 1, 0.1))
 plt.legend()
 
+# R2 Scores corrected
+plt.subplot(4, 1, 3)
+plt.plot(range(compFirst, compLast + 1), r2_score_list_train_coarse, marker='o', linestyle='-', label="Train Coarse", color="blue")
+plt.plot(range(compFirst, compLast + 1), r2_score_list_test_coarse_bias_corrected, marker='o', linestyle='-', label="Test Coarse", color="red")
+plt.plot(range(compFirst, compLast + 1), r2_score_list_train_fine, marker='x', linestyle='-', label="Train Fine", color="skyblue")
+plt.plot(range(compFirst, compLast + 1), r2_score_list_test_fine_bias_corrected, marker='x', linestyle='-', label="Test Fine", color="salmon")
+plt.xlabel('Number of Components')
+plt.ylabel('R² Score')
+plt.title(f'corrected R² Score vs Components in PLS Model for {target} in Dataset {datasetChoice} using LOOCV')
+plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on the x-axis
+plt.grid(True)
+plt.ylim(0, 1)
+plt.yticks(np.arange(0, 1, 0.1))
+plt.legend()
+
 # Bias
-plt.subplot(3, 1, 2)
+plt.subplot(4, 1, 4)
 plt.plot(range(compFirst, compLast + 1), bias_list_test_coarse, marker='o', linestyle='-', label="Test Coarse", color="red")
 plt.plot(range(compFirst, compLast + 1), bias_list_test_fine, marker='x', linestyle='-', label="Test Fine", color="salmon")
 plt.axhline(y=0, linestyle='-', color='green')
@@ -295,33 +322,7 @@ plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on
 plt.grid(True)
 plt.legend()
 
-# # R2 Scores corrected
-# plt.subplot(3, 1, 3)
-# plt.plot(range(compFirst, compLast + 1), r2_score_list_train_coarse, marker='o', linestyle='-', label="Train Coarse", color="blue")
-# plt.plot(range(compFirst, compLast + 1), r2_score_list_test_coarse_bias_corrected, marker='o', linestyle='-', label="Test Coarse", color="red")
-# plt.plot(range(compFirst, compLast + 1), r2_score_list_train_fine, marker='x', linestyle='-', label="Train Fine", color="skyblue")
-# plt.plot(range(compFirst, compLast + 1), r2_score_list_test_fine_bias_corrected, marker='x', linestyle='-', label="Test Fine", color="salmon")
-# plt.xlabel('Number of Components')
-# plt.ylabel('R² Score')
-# plt.title(f'corrected R² Score vs Components in PLS Model for {target} in Dataset {datasetChoice} using LOOCV')
-# plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on the x-axis
-# plt.grid(True)
-# plt.ylim(0, 1)
-# plt.yticks(np.arange(0, 1, 0.1))
-# plt.legend()
 
-# MAE
-plt.subplot(3, 1, 3)
-plt.plot(range(compFirst, compLast + 1), mae_list_train_coarse, marker='o', linestyle='-', label="Train Coarse", color="blue")
-plt.plot(range(compFirst, compLast + 1), mae_list_test_coarse, marker='o', linestyle='-', label="Test Coarse", color="red")
-plt.plot(range(compFirst, compLast + 1), mae_list_train_fine, marker='x', linestyle='-', label="Train Fine", color="skyblue")
-plt.plot(range(compFirst, compLast + 1), mae_list_test_fine, marker='x', linestyle='-', label="Test Fine", color="salmon")
-plt.xlabel('Number of Components')
-plt.ylabel('Mean Absolute Error')
-plt.title(f'MAE vs Components for {target} (mean:{mean} std:{std} in Dataset {datasetChoice} using LOOCV')
-plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on the x-axis
-plt.grid(True)
-plt.legend()
 
 # # MSE
 # plt.subplot(3, 1, 3)
@@ -337,5 +338,5 @@ plt.legend()
 # plt.legend()
 
 plt.tight_layout()
-plt.savefig(f"../plots/crossvalidation/plot_modelR2_bias_{targetChoice}_{datasetChoice}.png", dpi=1000)
+plt.savefig(f"../../plots/crossvalidation/plot_modelR2_bias_{targetChoice}_{datasetChoice}.png", dpi=1000)
 plt.show()
