@@ -266,15 +266,28 @@ for i in range(compFirst, compLast + 1):
 # Plot the R² scores and Bias for each number of components
 plt.figure(figsize=(12, 12))
 
-# MAE
+# # MAE
+# plt.subplot(4, 1, 1)
+# plt.plot(range(compFirst, compLast + 1), mae_list_train_coarse, marker='o', linestyle='-', label="Train Coarse", color="blue")
+# plt.plot(range(compFirst, compLast + 1), mae_list_test_coarse, marker='o', linestyle='-', label="Test Coarse", color="red")
+# plt.plot(range(compFirst, compLast + 1), mae_list_train_fine, marker='x', linestyle='-', label="Train Fine", color="skyblue")
+# plt.plot(range(compFirst, compLast + 1), mae_list_test_fine, marker='x', linestyle='-', label="Test Fine", color="salmon")
+# plt.xlabel('Number of Components')
+# plt.ylabel('Mean Absolute Error')
+# plt.title(f'MAE vs Components for {target} (mean:{mean} std:{std} in Dataset {datasetChoice} using LOOCV')
+# plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on the x-axis
+# plt.grid(True)
+# plt.legend()
+
+# MSE
 plt.subplot(4, 1, 1)
-plt.plot(range(compFirst, compLast + 1), mae_list_train_coarse, marker='o', linestyle='-', label="Train Coarse", color="blue")
-plt.plot(range(compFirst, compLast + 1), mae_list_test_coarse, marker='o', linestyle='-', label="Test Coarse", color="red")
-plt.plot(range(compFirst, compLast + 1), mae_list_train_fine, marker='x', linestyle='-', label="Train Fine", color="skyblue")
-plt.plot(range(compFirst, compLast + 1), mae_list_test_fine, marker='x', linestyle='-', label="Test Fine", color="salmon")
+plt.plot(range(compFirst, compLast + 1), mse_list_train_coarse, marker='o', linestyle='-', label="Train Coarse", color="blue")
+plt.plot(range(compFirst, compLast + 1), mse_list_test_coarse, marker='o', linestyle='-', label="Test Coarse", color="red")
+plt.plot(range(compFirst, compLast + 1), mse_list_train_fine, marker='x', linestyle='-', label="Train Fine", color="skyblue")
+plt.plot(range(compFirst, compLast + 1), mse_list_test_fine, marker='x', linestyle='-', label="Test Fine", color="salmon")
 plt.xlabel('Number of Components')
-plt.ylabel('Mean Absolute Error')
-plt.title(f'MAE vs Components for {target} (mean:{mean} std:{std} in Dataset {datasetChoice} using LOOCV')
+plt.ylabel('Mean Squared Error')
+plt.title(f'MSE vs Components for {target} (mean:{mean} std:{std} in Dataset {datasetChoice} using LOOCV')
 plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on the x-axis
 plt.grid(True)
 plt.legend()
@@ -323,20 +336,6 @@ plt.grid(True)
 plt.legend()
 
 
-
-# # MSE
-# plt.subplot(3, 1, 3)
-# plt.plot(range(compFirst, compLast + 1), mse_list_train_coarse, marker='o', linestyle='-', label="Train Coarse", color="blue")
-# plt.plot(range(compFirst, compLast + 1), mse_list_test_coarse, marker='o', linestyle='-', label="Test Coarse", color="red")
-# plt.plot(range(compFirst, compLast + 1), mse_list_train_fine, marker='x', linestyle='-', label="Train Fine", color="skyblue")
-# plt.plot(range(compFirst, compLast + 1), mse_list_test_fine, marker='x', linestyle='-', label="Test Fine", color="salmon")
-# plt.xlabel('Number of Components')
-# plt.ylabel('Mean Squared Error')
-# plt.title(f'MSE vs Components for {target} (mean:{mean} std:{std} in Dataset {datasetChoice} using LOOCV')
-# plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on the x-axis
-# plt.grid(True)
-# plt.legend()
-
 plt.tight_layout()
-plt.savefig(f"../../plots/crossvalidation/plot_modelR2_bias_{targetChoice}_{datasetChoice}.png", dpi=1000)
+plt.savefig(f"../../plots/crossvalidation/plot_modelR2_bias_{targetChoice}_{datasetChoice}_singleposition.png", dpi=1000)
 plt.show()
