@@ -7,7 +7,7 @@ from tensorflow.keras.layers import Conv1D, Flatten, Dense, Input
 ### Settings
 target = 'Lipid_%'
 datasetChoice = 3
-testFeed = 2
+testFeed = 0
 
 ### Load the data
 # median coarse
@@ -52,7 +52,7 @@ model = Sequential([
 ])
 
 # Compile the model
-model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+model.compile(optimizer='adam', loss='mse', metrics=['mse'])
 
 # Display the model summary
 model.summary()
@@ -76,5 +76,5 @@ plt.grid()
 plt.show()
 
 # Evaluate the model
-test_loss, test_mae = model.evaluate(X_test, y_test)
-print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
+test_loss, test_mse = model.evaluate(X_test, y_test)
+print(f"Test Loss: {test_loss}, Test mse: {test_mse}")

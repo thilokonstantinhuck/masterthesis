@@ -1,13 +1,17 @@
+import math
+
 from config.generalParameters import gcLength
 import pandas as pd
 import matplotlib.pyplot as plt
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, Flatten, Dense, Input
+from tensorflow.keras.optimizers import Adam
+
 
 ### Settings
 target = 'T_EPAandDHA'
 datasetChoice = 3
-testFeed = 2
+testFeed = 0
 
 ### Load the data
 # median coarse
@@ -26,16 +30,16 @@ feedGroups = [["S01", "S02", "S03", "S04", "S05", "S06"],
               ["S07", "S08", "S09", "S10", "S11", "S12"],
               ["S13", "S14", "S15", "S16", "S17", "S18"]]
 
-# data_coarse_train = data_coarse[~data_coarse["Fish_ID"].isin(feedGroups[testFeed])]
-# X_train = data_coarse_train.iloc[:, first_wavelength_coarse:].values
-# y_train = data_coarse_train[target].values
+data_coarse_train = data_coarse[~data_coarse["Fish_ID"].isin(feedGroups[testFeed])]
+X_train = data_coarse_train.iloc[:, first_wavelength_coarse:].values
+y_train = data_coarse_train[target].values
 
 
-data_fine_train = data_fine[~data_fine["Fish_ID"].isin(feedGroups[testFeed])]
-X_train = data_fine_train.iloc[:, first_wavelength_fine:].values
-y_train = data_fine_train[target].values
+# data_fine_train = data_fine[~data_fine["Fish_ID"].isin(feedGroups[testFeed])]
+# X_train = data_fine_train.iloc[:, first_wavelength_fine:].values
+# y_train = data_fine_train[target].values
 
-print(data_fine_train.shape)
+#print(data_fine_train.shape)
 
 ## Test the models
 data_coarse_test = data_coarse[data_coarse["Fish_ID"].isin(feedGroups[testFeed])]
@@ -46,19 +50,19 @@ y_test = data_coarse_test[target].values
 # Define the 1D CNN model
 model = Sequential([
     Input(shape=(X_train.shape[1], 1)),
-    Conv1D(filters=8, kernel_size=32, activation='relu',padding='same', strides=2),
+    Conv1D(filters=4, kernel_size=16, activation='relu',padding='same', strides=2),
     Flatten(),
     Dense(1)  # Output layer for regression
 ])
 
 # Compile the model
-model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+model.compile(optimizer=Adam(learning_rate=0.0001), loss='mse', metrics=['mse'])
 
 # Display the model summary
 model.summary()
 
 # Train the model
-history = model.fit(X_train, y_train, epochs=5, batch_size=32, validation_split=0.2)
+history = model.fit(X_train, y_train, epochs=20, batch_size=16, validation_split=0.2)
 
 # Extract loss values from the history object
 train_loss = history.history['loss']
@@ -76,5 +80,5 @@ plt.grid()
 plt.show()
 
 # Evaluate the model
-test_loss, test_mae = model.evaluate(X_test, y_test)
-print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
+test_loss, test_mse = model.evaluate(X_test, y_test)
+print(f"Test Loss: {test_loss}, Test rmse: {math.sqrt(test_mse)}")

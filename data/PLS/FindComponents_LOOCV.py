@@ -102,7 +102,7 @@ list_targets = [
     'T_C24_1n9'
 ]
 
-targetChoice = 55
+targetChoice = 9
 target = list_targets[targetChoice]
 # Components range to graph and calculate
 compFirst = 1

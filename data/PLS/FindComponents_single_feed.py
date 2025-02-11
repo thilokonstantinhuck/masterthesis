@@ -102,7 +102,7 @@ list_targets = [
     'T_C24_1n9'
 ]
 
-targetChoice = 0
+targetChoice = 55
 target = list_targets[targetChoice]
 # Components range to graph and calculate
 compFirst = 1
@@ -112,7 +112,7 @@ samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10",
 feedGroups = [["S01", "S02", "S03", "S04", "S05", "S06"],
               ["S07", "S08", "S09", "S10", "S11", "S12"],
               ["S13", "S14", "S15", "S16", "S17", "S18"]]
-feedTest = 0
+feedTest = 2
 ### Load the data
 
 # median coarse

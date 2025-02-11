@@ -22,7 +22,7 @@ data_fine = pd.read_csv(file_path)
 first_wavelength_fine = first_wavelength_coarse+4
 
 samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
-test_mae_list = []
+test_mse_list = []
 
 for sample in samples:
     print(sample)
@@ -47,14 +47,14 @@ for sample in samples:
     ])
 
     # Compile the model
-    model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+    model.compile(optimizer='adam', loss='mse', metrics=['mse'])
 
     # Train the model
     history = model.fit(X_train, y_train, epochs=5, batch_size=32, validation_split=0.2)
 
     # Evaluate the model
-    test_loss, test_mae = model.evaluate(X_test, y_test)
-    print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
-    test_mae_list.append(test_mae)
+    test_loss, test_mse = model.evaluate(X_test, y_test)
+    print(f"Test Loss: {test_loss}, Test mse: {test_mse}")
+    test_mse_list.append(test_mse)
 
-print(np.mean(test_mae_list))
+print(np.mean(test_mse_list))

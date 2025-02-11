@@ -7,7 +7,7 @@ from tensorflow.keras.layers import Conv1D, Flatten, Dense, Input
 ### Settings
 target = 'T_EPAandDHA'
 datasetChoice = 3
-testPosition = 3
+testPosition = 2
 
 ### Load the data
 # median coarse
@@ -48,13 +48,13 @@ model = Sequential([
 ])
 
 # Compile the model
-model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+model.compile(optimizer='adam', loss='mse', metrics=['mse'])
 
 # Display the model summary
 model.summary()
 
 # Train the model
-history = model.fit(X_train, y_train, epochs=3, batch_size=32, validation_split=0.2)
+history = model.fit(X_train, y_train, epochs=5, batch_size=32, validation_split=0.2)
 
 # Extract loss values from the history object
 train_loss = history.history['loss']
@@ -72,5 +72,5 @@ plt.grid()
 plt.show()
 
 # Evaluate the model
-test_loss, test_mae = model.evaluate(X_test, y_test)
-print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
+test_loss, test_mse = model.evaluate(X_test, y_test)
+print(f"Test Loss: {test_loss}, Test mse: {test_mse}")

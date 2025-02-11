@@ -102,14 +102,14 @@ list_targets = [
     'T_C24_1n9'
 ]
 
-targetChoice = 55
+targetChoice = 0
 target = list_targets[targetChoice]
 # Components range to graph and calculate
 compFirst = 1
 compLast = 25
 datasetChoice = 3
 positions = ["H","T","F1","NQC1","NQC2"]
-position_selection = positions[3]
+position_selection = positions[1]
 samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
 #samples = ["S01", "S02", "S03", "S04", "S05", "S06"]
 #samples = ["S07", "S08", "S09", "S10", "S11", "S12"]
@@ -290,6 +290,7 @@ plt.ylabel('Mean Squared Error')
 plt.title(f'MSE vs Components for {target} (mean:{mean} std:{std} in Dataset {datasetChoice} using LOOCV')
 plt.xticks(range(compFirst, compLast + 1))  # Ensure each component is marked on the x-axis
 plt.grid(True)
+plt.ylim(0, 40)
 plt.legend()
 
 

@@ -1,4 +1,6 @@
 import spectral.io.envi as envi
+from matplotlib import pyplot as plt
+
 from config.generalParameters import gcLength
 import numpy as np
 import pandas as pd
@@ -6,7 +8,7 @@ from sklearn.cross_decomposition import PLSRegression
 import cv2
 
 ## Settings
-number_of_components = 1
+number_of_components = 15
 
 # Set grayscale limits depending on the target for the predicted image
 list_targets = [
@@ -105,7 +107,7 @@ list_targets = [
     'T_C24_1n9'
 ]
 
-targetChoice = 48
+targetChoice = 9
 target = list_targets[targetChoice]
 
 min_val, max_val = 0, 20  # Adjust these values as needed
@@ -113,7 +115,7 @@ min_val, max_val = 0, 20  # Adjust these values as needed
 
 
 datasetChoice = 3
-samplename = "S12"
+samplename = "S16"
 ROI = [
     [240, 750],
     [243, 750],
@@ -181,6 +183,21 @@ predicted_image_coarse_scaled = np.clip((predicted_image_coarse - min_val) * 255
 predicted_image_fine_scaled = np.clip((predicted_image_fine - min_val) * 255 / (max_val - min_val), 0, 255).astype(np.uint8)
 cv2.imwrite(f"../plots/prediction_pictures/{samplename}_{target}_{datasetChoice}_{number_of_components}_coarse.png", predicted_image_coarse_scaled)
 cv2.imwrite(f"../plots/prediction_pictures/{samplename}_{target}_{datasetChoice}_{number_of_components}_fine.png", predicted_image_fine_scaled)
+
+
+# Function to plot and save an image with a rainbow colormap
+def save_colormap_image(image, title, filename):
+    plt.figure(figsize=(18, 13))
+    plt.imshow(image, cmap="jet", vmin=min_val, vmax=max_val)  # Apply rainbow colormap
+    plt.colorbar(label=target)  # Add color scale
+    plt.axis("off")  # Hide axes
+    plt.title(title)
+    plt.savefig(filename, bbox_inches="tight", dpi=300)  # Save as PNG
+    plt.close()
+
+# Save images with colormap
+save_colormap_image(predicted_image_coarse, "Coarse Prediction", f"../plots/prediction_pictures/{samplename}_{target}_{datasetChoice}_{number_of_components}_coarse_colormap.png")
+save_colormap_image(predicted_image_fine, "Fine Prediction", f"../plots/prediction_pictures/{samplename}_{target}_{datasetChoice}_{number_of_components}_fine_colormap.png")
 
 # # Retrieve the wavelengths from the header metadata
 # wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32).flatten()

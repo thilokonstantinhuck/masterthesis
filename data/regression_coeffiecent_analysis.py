@@ -241,7 +241,7 @@ for feed in feedGroups:
         measured_calibration = y_fine
         predicted_calibration = pls_model_fine.predict(X_fine)
         measured_test = y_test
-        predicted_test = y_predicted_fine_c
+        predicted_test = y_predicted_fine
 
     feedCounter += 1
 
@@ -267,8 +267,8 @@ plt.savefig(f"../plots/regression/plot_regression_coefficients_{target}_{dataset
 
 # Show the plots
 plt.show()
-set_max = 25
-set_min = 0
+set_max = 30
+set_min = -5
 # Plot
 plt.figure(figsize=(8, 6))
 # Calibration set
