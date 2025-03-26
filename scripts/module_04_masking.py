@@ -284,6 +284,35 @@ def fineMasking(samplename, centerPoints, subsquare_size, dataSetName):
     # Display the plot
     plt.show()
 
+def fineMaskingAdjustable(samplename, centerPoints, subsquare_size, numberOfSubsquares, dataSetName):
+    # Load the binary mask
+    binary_mask = imread(f"./plots/{dataSetName}_plot_{samplename}_emsc.png")
+
+    # Create a figure and axis to plot the image
+    fig, ax = plt.subplots(figsize=(10, 20))  # Adjust the figure size to match the aspect ratio
+
+    # Display the image
+    ax.imshow(binary_mask, cmap='gray')
+
+    for top_left, name in centerPoints:
+        for row in range(numberOfSubsquares):
+            for col in range(numberOfSubsquares):
+                width = subsquare_size
+                height = subsquare_size
+                rect = patches.Rectangle((top_left[1]+col*subsquare_size, top_left[0]+row*subsquare_size), width, height, linewidth=1, edgecolor='r', facecolor='none')
+
+                ax.add_patch(rect)
+
+    # Customize the plot as needed
+    ax.set_title(f'Binary Mask {dataSetName}_{samplename} with Rectangles')
+    ax.axis('on')  # Show the axes
+
+    # Save the plot as an image file
+    fig.savefig(f"./plots/{dataSetName}_plot_{samplename}_combined_mask.png", dpi=300, bbox_inches='tight')
+
+    # Display the plot
+    plt.show()
+
 def emscPicture(samplename, emscWavelength, wlMin, wlMax, dataSetName):
     # Load the hyperspectral image with absorption data
     hdr = f"./tempImages/{dataSetName}_processed_image_{samplename}_absorbance_EMSC.hdr"
@@ -319,19 +348,16 @@ def emscPicture(samplename, emscWavelength, wlMin, wlMax, dataSetName):
     emsc_image.save(f"./plots/{dataSetName}_plot_{samplename}_emsc.png")
     print(f"EMSC Picture {dataSetName}_{samplename} {emscWavelength}nm saved successfully.")
 
-def fineCutMaskCreation(samplename, centerPoints, subsquare_size, dataSetName):
+def fineCutMaskCreation(samplename, centerPoints, subsquare_size, numberOfSubsquares, dataSetName):
     # Load the binary mask
     binary_mask = imread(f"./masks/{dataSetName}_binary_mask_{samplename}_combined.png")
-
-    # Draw each rectangle
-    numberOfSubsquares = 5
 
     for top_left, name in centerPoints:
         for row in range(numberOfSubsquares):
             for col in range(numberOfSubsquares):
                 # Create a mask of the same dimensions as the original binary mask
                 mask = np.zeros_like(binary_mask)
-                squareID = (row*5)+col
+                squareID = (row*numberOfSubsquares)+col
                 x = top_left[1]+col*subsquare_size
                 y = top_left[0]+row*subsquare_size
                 # Fill in the rectangle area with the original mask's values
@@ -342,6 +368,6 @@ def fineCutMaskCreation(samplename, centerPoints, subsquare_size, dataSetName):
 
                 # Convert the mask to an image and save as PNG
                 mask_image = Image.fromarray(mask)
-                mask_image.save(f"./masks/{dataSetName}_binary_mask_partial_{samplename}_{name}_{squareID}.png")
+                mask_image.save(f"./masks/{dataSetName}_binary_mask-partial_{numberOfSubsquares}/{samplename}_{name}_{squareID}.png")
 
                 print(f"Mask for {dataSetName}_{samplename} {name} {squareID} saved")
