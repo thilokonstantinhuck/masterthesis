@@ -15,6 +15,16 @@ samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10",
 # set Dataset to use (0,1 or 2)
 dataSetChoice = 2
 
+squareMaps =[
+    [1, 48],
+    [2, 24],
+    [3, 16],
+    [4, 12],
+    [5, 10],
+    [6, 8],
+    [7, 7],
+    [8, 6],
+]
 
 def load_sample_config(sampleName):
     # Construct the module name dynamically
@@ -48,7 +58,8 @@ for sample in samples:
     from scripts.module_04_masking import fineMasking, emscPicture, fineCutMaskCreation, cutMaskCreation
     # emscPicture(config.samplename,emscWavelength1,emscWL1min,emscWL1max, dataSetChoice+1)
     # fineMasking(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice], dataSetChoice+1)
-    # fineCutMaskCreation(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice], dataSetChoice+1)
+    #for mapDef in squareMaps:
+    #    fineCutMaskCreation(config.samplename, config.areasOfInterest[dataSetChoice], mapDef[1], mapDef[0], dataSetChoice+1)
     # cutMaskCreation(config.samplename, config.areasOfInterest[dataSetChoice], subsquareSize[dataSetChoice], dataSetChoice+1)
     #
     # # 5 plot average spectra
@@ -57,6 +68,7 @@ for sample in samples:
     # fineAveragePlotAreas(config.samplename, dataSetChoice+1)
 
 # create dataframe
-from scripts.module_07_tableCreation import exportDataFrame
-exportDataFrame(dataSetChoice+1)
+granularity = 8
+from scripts.module_07_tableCreation import exportDataFrameFine
+exportDataFrameFine(dataSetChoice+1, granularity)
 

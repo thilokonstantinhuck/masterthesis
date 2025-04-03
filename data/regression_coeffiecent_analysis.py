@@ -104,10 +104,10 @@ list_targets = [
 
 targetChoice = 0
 target = list_targets[targetChoice]
-components = 10
+components = 1
 # List of sample names
 datasetChoice = 3
-testFeed = 3
+testFeed = 1
 # positions = ["H","T","F1","NQC1","NQC2"]
 # position_selection = positions[3]
 #samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
@@ -232,10 +232,10 @@ for feed in feedGroups:
     mae_fine_c = round(mean_absolute_error(y_test, y_predicted_fine_c),2)
 
 
-    # Plot on the first subplot (coarse)
-    axes[0].plot(wavelengths, coefficients_coarse, label=f'Coarse Model (R2: {r2_coarse_u}(C:{r2_coarse_c}), MAE{mae_coarse_u}(C:{mae_coarse_c})) without Feed {feedCounter}', linewidth=2, alpha=0.6)
-    # Plot on the second subplot (fine)
-    axes[1].plot(wavelengths, coefficients_fine, label=f'Fine Model (R2: {r2_fine_u}(C:{r2_fine_c}), MAE{mae_fine_u}(C:{mae_fine_c})) without Feed {feedCounter}', linewidth=2, alpha=0.6)
+    # Plot on the first subplot (coarse) (R2: {r2_coarse_u}(C:{r2_coarse_c}), MAE{mae_coarse_u}(C:{mae_coarse_c}))
+    axes[0].plot(wavelengths, coefficients_coarse, label=f'Coarse Model without Feed {feedCounter}', linewidth=2, alpha=0.6)
+    # Plot on the second subplot (fine)(R2: {r2_fine_u}(C:{r2_fine_c}), MAE{mae_fine_u}(C:{mae_fine_c}))
+    axes[1].plot(wavelengths, coefficients_fine, label=f'Fine Model without Feed {feedCounter}', linewidth=2, alpha=0.6)
 
     if feedCounter == testFeed:
         measured_calibration = y_fine
@@ -267,8 +267,8 @@ plt.savefig(f"../plots/regression/plot_regression_coefficients_{target}_{dataset
 
 # Show the plots
 plt.show()
-set_max = 30
-set_min = -5
+set_max = 28
+set_min = -0.1
 # Plot
 plt.figure(figsize=(8, 6))
 # Calibration set

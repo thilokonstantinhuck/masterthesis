@@ -8,7 +8,7 @@ from sklearn.cross_decomposition import PLSRegression
 import cv2
 
 ## Settings
-number_of_components = 15
+number_of_components = 1
 
 # Set grayscale limits depending on the target for the predicted image
 list_targets = [
@@ -107,7 +107,7 @@ list_targets = [
     'T_C24_1n9'
 ]
 
-targetChoice = 9
+targetChoice = 0
 target = list_targets[targetChoice]
 
 min_val, max_val = 0, 20  # Adjust these values as needed
@@ -115,7 +115,7 @@ min_val, max_val = 0, 20  # Adjust these values as needed
 
 
 datasetChoice = 3
-samplename = "S16"
+samplename = "S15"
 ROI = [
     [240, 750],
     [243, 750],

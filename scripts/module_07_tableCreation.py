@@ -6,24 +6,37 @@ from matplotlib.image import imread
 import math
 import pandas as pd
 
-def exportDataFrame(dataSetChoice):
+def exportDataFrameCoarse(dataSetChoice):
     # List of sample names
     samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
 
     dfListCoarse = []
-    dfListFine = []
 
     for sample in samples:
         dfListCoarse.append(createDataFrameCoarse(sample, dataSetChoice))
-        dfListFine.append(createDataFrameFine(sample, dataSetChoice))
 
     # Concatenate all DataFrames into one
     final_df_coarse = pd.concat(dfListCoarse, ignore_index=True)
-    final_df_fine = pd.concat(dfListFine, ignore_index=True)
 
     # Export the final DataFrame to a CSV file
     final_df_coarse.to_csv(f'./data/exported_data_coarse_median_dataset{dataSetChoice}.csv', index=False)
-    final_df_fine.to_csv(f'./data/exported_data_fine_dataset{dataSetChoice}.csv', index=False)
+
+    print("Data exported successfully")
+
+def exportDataFrameFine(dataSetChoice, granularity):
+    # List of sample names
+    samples = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18"]
+
+    dfListFine = []
+
+    for sample in samples:
+        dfListFine.append(createDataFrameFine(sample, dataSetChoice, granularity))
+
+    # Concatenate all DataFrames into one
+    final_df_fine = pd.concat(dfListFine, ignore_index=True)
+
+    # Export the final DataFrame to a CSV file
+    final_df_fine.to_csv(f'./data/exported_data_fine_{granularity}_dataset{dataSetChoice}.csv', index=False)
 
     print("Data exported successfully")
 
@@ -90,7 +103,7 @@ def createDataFrameCoarse(samplename, dataSetName):
     return df
 
 
-def createDataFrameFine(samplename, dataSetName):
+def createDataFrameFine(samplename, dataSetName, granularity):
     # Load the image
     hdr = f"./tempImages/{dataSetName}_processed_image_{samplename}_absorbance_EMSC.hdr"
     img = envi.open(hdr)
@@ -109,7 +122,7 @@ def createDataFrameFine(samplename, dataSetName):
     wavelengths = np.array(img.metadata['wavelength'], dtype=np.float32)
 
     # mask path and lists
-    maskPath = f"./masks/{dataSetName}_binary_mask_partial"
+    maskPath = f"./masks/{dataSetName}_binary_mask-partial_{granularity}/"
     positions = ["H","T","F1","NQC1","NQC2"]
     replicates = ["R1","R2","R3"]
 
@@ -117,10 +130,10 @@ def createDataFrameFine(samplename, dataSetName):
 
     # Loop through each mask, calculate the average spectrum, and save in table
     for pos in positions:
-        print(f"({pos})({samplename})")
-        for fineMask in range(25):
+        #print(f"({pos})({samplename})")
+        for fineMask in range(granularity*granularity):
             # Load the binary mask
-            maskPathFull = maskPath + "_" + samplename + "_" + pos + "_" + str(fineMask) + ".png"
+            maskPathFull = maskPath + samplename + "_" + pos + "_" + str(fineMask) + ".png"
             binary_mask = imread(maskPathFull)
 
             # Initialize an array to accumulate the spectra
